@@ -37,7 +37,6 @@ end
 local load_order = {
     'lib',           -- Load helper libraries first
     'items',         -- Load game content (jokers, consumables, etc.)
-    'localization'   -- Load localization files last
 }
 
 -- Load each directory in order
@@ -50,3 +49,4 @@ end
 
 -- Print successful load message
 sendInfoMessage('[Carnival] Mod loaded successfully!')
+sendInfoMessage("And let the games... begin!")

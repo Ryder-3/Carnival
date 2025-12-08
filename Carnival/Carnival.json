@@ -1,5 +1,5 @@
 {
-    "Id" : "carnival",
+    "id" : "carnival",
     "name" : "Carnival",
     "display_name" : "Carnival",
     "author" : ["Ryder"],
