@@ -52,20 +52,43 @@ SMODS.Joker{
     loc_txt = {
         name = "Hearts Quest",
         text = {
-            "After playing 100 heart cards",
-            "This joker gives you {X:mult}^1.5{} chips and mult"
+            "After playing #2# heart cards",
+            "This joker gives you {X:mult}#3#{} chips and mult",
+            "Currently #1#/#2#"
         }
     },
-    cost = 10,
     config = {
         immutable = {
             Emult = 1.5,
             Echips = 1.5,
-            start = 0,
+            played_hearts = 0,
             --TODO change to 100 once testing is done
             goal = 1,
         },
     },
-    rarity = "carnival_quest"
+    rarity = "carnival_quest",
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                number_format(center.ability.immutable.played_hearts),
+				number_format(center.ability.immutable.goal),
+				number_format(center.ability.immutable.Emult),
+            }
+        }
+    end,
+    --TODO sound effects for this should feel more powerful than the normal joker sound
+    calculate = function(self, card, context)
 
+        if context.before and context.cardarea == G.play then
+            
+        end
+        --should check which cards are hearts before the hand scores
+            --after that, add the number of played heart cards to "played_hearts"
+
+        --should have another check AFTER all the cards score
+            --during this moment, check if "played_hearts" is >= "goal"
+            --If it is, then should raise the chips and mult to the power of 1.5
+                --TODO look for an Emult and Echips function
+        
+    end,
 }
