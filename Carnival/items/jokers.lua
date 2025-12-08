@@ -48,7 +48,7 @@
 SMODS.Joker{
     key = "hearts_quest",
     atlas = "atlasjokers",
-    pos = { x = 0, y = 0 },
+    pos = { x = 2, y = 0 },
     loc_txt = {
         name = "Hearts Quest",
         text = {
