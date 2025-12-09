@@ -2,6 +2,9 @@
 ## Additions
 Finished the logic for making progress on the Heart's quest joker
 
+## Additions
+Finished the first version for the logic of all four quest jokers
+
 # [12/8/2025]
 ## Additions
 Added a first test joker and started working on the quest jokers
