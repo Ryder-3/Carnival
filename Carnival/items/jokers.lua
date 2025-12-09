@@ -44,7 +44,7 @@
 -- Hearts quest joker
 -- Idea: Ryder
 -- Coder: Ryder
--- TODO come up with a better name and quest
+--[[ TODO come up with a better name and quest]]
 SMODS.Joker{
     key = "hearts_quest",
     atlas = "atlasjokers",
@@ -53,42 +53,56 @@ SMODS.Joker{
         name = "Hearts Quest",
         text = {
             "After playing #2# heart cards",
-            "This joker gives you {X:mult}#3#{} chips and mult",
+            "This joker gives you {X:mult}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
     config = {
-        immutable = {
             Emult = 1.5,
             Echips = 1.5,
             played_hearts = 0,
             --TODO change to 100 once testing is done
             goal = 1,
-        },
     },
     rarity = "carnival_quest",
     loc_vars = function(self, info_queue, card)
         return {
             vars = {
-                number_format(center.ability.immutable.played_hearts),
-				number_format(center.ability.immutable.goal),
-				number_format(center.ability.immutable.Emult),
+                card.ability.played_hearts,
+				card.ability.goal,
+				card.ability.Emult,
             }
         }
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
-        if context.before and context.cardarea == G.play then
-            
+        --The logic for making progress on the joker.
+        if context.before and not context.blueprint and not context.retrigger_joker then
+            local heart_played = false
+            local num_hearts = 0
+            for _, played_card in ipairs(context.scoring_hand) do
+                if played_card:is_suit('Hearts') then
+                    card.ability.played_hearts = card.ability.played_hearts + 1
+                    heart_played = true
+                    num_hearts = num_hearts + 1
+                end
+            end
+            if heart_played and card.ability.played_hearts - num_hearts < card.ability.goal then
+                return {
+                    card = card,
+                    message = card.ability.played_hearts .. "/" .. card.ability.goal,
+                    colour = G.C.HEARTS
+                }
+            end
         end
-        --should check which cards are hearts before the hand scores
-            --after that, add the number of played heart cards to "played_hearts"
 
+
+        
         --should have another check AFTER all the cards score
             --during this moment, check if "played_hearts" is >= "goal"
             --If it is, then should raise the chips and mult to the power of 1.5
                 --TODO look for an Emult and Echips function
         
-    end,
+    end
 }
