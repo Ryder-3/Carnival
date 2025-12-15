@@ -1,3 +1,7 @@
+# [12/15/2025]
+## Additions
+Made quest jokers obtainable by opening a quest pack, this pack will only show unowned quest jokers
+
 # [12/9/2025]
 ## Additions
 Finished the logic for making progress on the Heart's quest joker

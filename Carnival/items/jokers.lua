@@ -44,12 +44,11 @@
 -- Hearts quest joker
 -- Idea: Ryder
 -- Coder: Ryder
---[[ TODO come up with a better name and quest]]
+-- TODO come up with a better name and quest
 SMODS.Joker{
     key = "hearts_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
-    set = "carnival_quest",
     loc_txt = {
         name = "Hearts Quest",
         text = {
@@ -65,6 +64,7 @@ SMODS.Joker{
             goal = 100,
     },
     rarity = "carnival_quest",
+    pools = {carnival_quest = true},
     loc_vars = function(self, info_queue, card)
         return {
             vars = {
@@ -74,6 +74,12 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
+    end,
+    add_to_deck = function(self, card)
+        Carnival.owned_quests["hearts"] = true
+    end,
+    remove_from_deck = function(self, card)
+        Carnival.owned_quests["hearts"] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
@@ -120,12 +126,11 @@ SMODS.Joker{
 -- Spades quest joker
 -- Idea: Ryder
 -- Coder: Ryder
---[[ TODO come up with a better name and quest]]
+-- TODO come up with a better name and quest
 SMODS.Joker{
     key = "spades_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
-    set = "carnival_quest",
     loc_txt = {
         name = "Spades Quest",
         text = {
@@ -141,6 +146,7 @@ SMODS.Joker{
             goal = 100,
     },
     rarity = "carnival_quest",
+    pools = {carnival_quest = true},
     loc_vars = function(self, info_queue, card)
         return {
             vars = {
@@ -150,6 +156,12 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
+    end,
+    add_to_deck = function(self, card)
+        Carnival.owned_quests["spades"] = true
+    end,
+    remove_from_deck = function(self, card)
+        Carnival.owned_quests["spades"] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
@@ -195,12 +207,11 @@ SMODS.Joker{
 -- Diamonds quest joker
 -- Idea: Ryder
 -- Coder: Ryder
---[[ TODO come up with a better name and quest]]
+-- TODO come up with a better name and quest
 SMODS.Joker{
     key = "diamonds_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
-    set = "carnival_quest",
     loc_txt = {
         name = "Diamonds Quest",
         text = {
@@ -216,6 +227,7 @@ SMODS.Joker{
             goal = 100,
     },
     rarity = "carnival_quest",
+    pools = {carnival_quest = true},
     loc_vars = function(self, info_queue, card)
         return {
             vars = {
@@ -225,6 +237,12 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
+    end,
+    add_to_deck = function(self, card)
+        Carnival.owned_quests["diamonds"] = true
+    end,
+    remove_from_deck = function(self, card)
+        Carnival.owned_quests["diamonds"] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
@@ -270,12 +288,11 @@ SMODS.Joker{
 -- Clubs quest joker
 -- Idea: Ryder
 -- Coder: Ryder
---[[ TODO come up with a better name and quest]]
+-- TODO come up with a better name and quest
 SMODS.Joker{
     key = "clubs_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
-    set = "carnival_quest",
     loc_txt = {
         name = "Clubs Quest",
         text = {
@@ -291,6 +308,7 @@ SMODS.Joker{
             goal = 100,
     },
     rarity = "carnival_quest",
+    pools = {carnival_quest = true},
     loc_vars = function(self, info_queue, card)
         return {
             vars = {
@@ -300,6 +318,12 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
+    end,
+    add_to_deck = function(self, card)
+        Carnival.owned_quests["clubs"] = true
+    end,
+    remove_from_deck = function(self, card)
+        Carnival.owned_quests['clubs'] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
