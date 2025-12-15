@@ -49,11 +49,12 @@ SMODS.Joker{
     key = "hearts_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
+    set = "carnival_quest",
     loc_txt = {
         name = "Hearts Quest",
         text = {
             "After playing #2# heart cards",
-            "This joker gives you {X:mult}^#3#{} chips and mult",
+            "Scored hearts give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -61,8 +62,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_hearts = 0,
-            --TODO change to 100 once testing is done
-            goal = 1,
+            goal = 100,
     },
     rarity = "carnival_quest",
     loc_vars = function(self, info_queue, card)
@@ -125,11 +125,12 @@ SMODS.Joker{
     key = "spades_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
+    set = "carnival_quest",
     loc_txt = {
         name = "Spades Quest",
         text = {
             "After playing #2# spade cards",
-            "scored spade cards give{X:mult}^#3#{} chips and mult",
+            "scored spades give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -137,8 +138,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_spades = 0,
-            --TODO change to 100 once testing is done
-            goal = 1,
+            goal = 100,
     },
     rarity = "carnival_quest",
     loc_vars = function(self, info_queue, card)
@@ -200,11 +200,12 @@ SMODS.Joker{
     key = "diamonds_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
+    set = "carnival_quest",
     loc_txt = {
         name = "Diamonds Quest",
         text = {
             "After playing #2# diamond cards",
-            "This joker gives you {X:mult}^#3#{} chips and mult",
+            "scored diamonds give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -212,8 +213,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_diamonds = 0,
-            --TODO change to 100 once testing is done
-            goal = 1,
+            goal = 100,
     },
     rarity = "carnival_quest",
     loc_vars = function(self, info_queue, card)
@@ -275,11 +275,12 @@ SMODS.Joker{
     key = "clubs_quest",
     atlas = "atlasjokers",
     pos = { x = 1, y = 0 },
+    set = "carnival_quest",
     loc_txt = {
         name = "Clubs Quest",
         text = {
             "After playing #2# club cards",
-            "This joker gives you {X:mult}^#3#{} chips and mult",
+            "Scored clubs give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -287,8 +288,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_clubs = 0,
-            --TODO change to 100 once testing is done
-            goal = 1,
+            goal = 100,
     },
     rarity = "carnival_quest",
     loc_vars = function(self, info_queue, card)
@@ -342,3 +342,26 @@ SMODS.Joker{
         end
     end
 }
+
+--Pity system joker
+--idea Ryder
+-- coder Ryder
+
+-- TODO: Make a system that will actually calculate the death streak
+--[[SMODS.joker {
+    key = "pity_system",
+    atlas = "atlasjokers",
+    pos = {x = 0, y = 0},
+    loc_txt = {
+        name = "Pity System",
+        text = {
+            "Gain {X:mult}x #1#{} mult for",
+            "each death sense last win",
+            "Currently {X:mult}x #3#{}"
+        }
+    },
+    config = {
+        mult_scaling = 2,
+    },
+}]]
+

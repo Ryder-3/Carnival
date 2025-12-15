@@ -5,7 +5,7 @@
     "author" : ["Ryder"],
     "description" : "A Cryptid addon with the focus of making the game even more chaotic.",
     "prefix" : "carnival",
-    "main_file" : "carnival.lua",
+    "main_file" : "Carnival.lua",
     "priority" : 0,
     "badge_colour" : "",
     "badge_text_colour" : "",

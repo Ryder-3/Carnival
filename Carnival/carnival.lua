@@ -2,8 +2,13 @@
 --- A Cryptid addon focused on making the game even more chaotic
 --- Author: Ryder
 
+if not Carnival then
+    Carnival = {}
+end
+
 -- Get the current mod object
 local carnival_mod = SMODS.current_mod
+
 
 -- Helper function to load all Lua files from a directory
 local function load_directory(path)
@@ -48,5 +53,6 @@ for _, dir in ipairs(load_order) do
 end
 
 -- Print successful load message
-sendInfoMessage('[Carnival] Mod loaded successfully!')
-sendInfoMessage("And let the games... begin!")
+sendInfoMessage("[Carnival] And let the games... begin!")
+
+
