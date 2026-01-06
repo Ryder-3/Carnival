@@ -213,7 +213,7 @@ SMODS.Joker{
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "diamonds_quest",
-    atlas = "atlas_jokers",
+    atlas = "atlas_temp_jokers",
     pos = { x = 0, y = 0 },
     loc_txt = {
         name = "Diamonds Devourer",
@@ -295,7 +295,7 @@ SMODS.Joker{
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "clubs_quest",
-    atlas = "atlas_jokers",
+    atlas = "atlas_temp_jokers",
     pos = { x = 0, y = 0 },
     loc_txt = {
         name = "Clubss Consumer",

@@ -12,7 +12,7 @@ SMODS.Booster {
         },
     },
     --TODO: make an actual booster atlas and put this in it
-    atlas = "atlasjokers",
+    atlas = "atlas_temp_jokers",
     pos = {x = 0, y = 0},
     discovered = true,
     loc_vars = function(self, info_queue, card)
