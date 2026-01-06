@@ -1,6 +1,12 @@
 SMODS.Atlas{
-    key = "atlasjokers",
+    key = "atlas_temp_jokers",
     path = "Jokers.png",
+    px = 71,
+    py = 95
+}
+SMODS.Atlas{
+    key = "atlas_jokers",
+    path = "CarnivalJokerSpriteSheet.png",
     px = 71,
     py = 95
 }

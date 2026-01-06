@@ -44,13 +44,14 @@
 -- Hearts quest joker
 -- Idea: Ryder
 -- Coder: Ryder
+-- Name and Art: OBJ_Lily
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "hearts_quest",
-    atlas = "atlasjokers",
-    pos = { x = 1, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 0, y = 0 },
     loc_txt = {
-        name = "Hearts Quest",
+        name = "Hearts Hunger",
         text = {
             "After playing #2# heart cards",
             "Scored hearts give {X:dark_edition,C:white}^#3#{} chips and mult",
@@ -126,13 +127,14 @@ SMODS.Joker{
 -- Spades quest joker
 -- Idea: Ryder
 -- Coder: Ryder
+-- Name: OBJ_Lily
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "spades_quest",
-    atlas = "atlasjokers",
-    pos = { x = 1, y = 0 },
+    atlas = "atlas_temp_jokers",
+    pos = { x = 0, y = 0 },
     loc_txt = {
-        name = "Spades Quest",
+        name = "Spades Slobberer",
         text = {
             "After playing #2# spade cards",
             "scored spades give {X:dark_edition,C:white}^#3#{} chips and mult",
@@ -207,13 +209,14 @@ SMODS.Joker{
 -- Diamonds quest joker
 -- Idea: Ryder
 -- Coder: Ryder
+-- Name: OBJ_Lily
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "diamonds_quest",
-    atlas = "atlasjokers",
-    pos = { x = 1, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 0, y = 0 },
     loc_txt = {
-        name = "Diamonds Quest",
+        name = "Diamonds Devourer",
         text = {
             "After playing #2# diamond cards",
             "scored diamonds give {X:dark_edition,C:white}^#3#{} chips and mult",
@@ -288,13 +291,14 @@ SMODS.Joker{
 -- Clubs quest joker
 -- Idea: Ryder
 -- Coder: Ryder
+-- Name: OBJ_Lily
 -- TODO come up with a better name and quest
 SMODS.Joker{
     key = "clubs_quest",
-    atlas = "atlasjokers",
-    pos = { x = 1, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 0, y = 0 },
     loc_txt = {
-        name = "Clubs Quest",
+        name = "Clubss Consumer",
         text = {
             "After playing #2# club cards",
             "Scored clubs give {X:dark_edition,C:white}^#3#{} chips and mult",
