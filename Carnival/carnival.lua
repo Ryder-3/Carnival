@@ -1,10 +1,7 @@
 --- CARNIVAL MOD
 --- A Cryptid addon focused on making the game even more chaotic
 --- Author: Ryder
-
-if not Carnival then
-    Carnival = {}
-end
+sendInfoMessage("[Carnival] Loading Carnival Mod...")
 
 -- Get the current mod object
 local carnival_mod = SMODS.current_mod

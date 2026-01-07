@@ -41,6 +41,25 @@
     end,
 }]]
 
+
+
+--GDUMP
+--TODO GET RID OF THIS AFTER DEV IS DONE
+SMODS.Joker{
+    key = "G_DUMP",
+    atlas = "atlas_temp_jokers",
+    pos = {x = 0, y = 0},
+    loc_txt = {
+        name = "G DUMP",
+        text = {
+            "Upon getting this joker, G will be dumped into the console"
+        }
+    },
+    add_to_deck = function()
+        sendInfoMessage("[Carnival] G DUMP: "..dump(G.GAME))        
+    end
+}
+
 -- Hearts quest joker
 -- Idea: Ryder
 -- Coder: Ryder
@@ -75,12 +94,6 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
-    end,
-    add_to_deck = function(self, card)
-        Carnival.owned_quests["hearts"] = true
-    end,
-    remove_from_deck = function(self, card)
-        Carnival.owned_quests["hearts"] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
@@ -159,12 +172,6 @@ SMODS.Joker{
             }
         }
     end,
-    add_to_deck = function(self, card)
-        Carnival.owned_quests["spades"] = true
-    end,
-    remove_from_deck = function(self, card)
-        Carnival.owned_quests["spades"] = false
-    end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
@@ -241,12 +248,6 @@ SMODS.Joker{
             }
         }
     end,
-    add_to_deck = function(self, card)
-        Carnival.owned_quests["diamonds"] = true
-    end,
-    remove_from_deck = function(self, card)
-        Carnival.owned_quests["diamonds"] = false
-    end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
@@ -322,12 +323,6 @@ SMODS.Joker{
                 card.ability.Echips,
             }
         }
-    end,
-    add_to_deck = function(self, card)
-        Carnival.owned_quests["clubs"] = true
-    end,
-    remove_from_deck = function(self, card)
-        Carnival.owned_quests['clubs'] = false
     end,
     --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
