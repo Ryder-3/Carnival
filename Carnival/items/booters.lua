@@ -27,11 +27,16 @@ SMODS.Booster {
         choose = 1
     },
     
+    --I'm pretty sure that create_card works like a for loop that gets iterated throgugh config.extra times
     create_card = function(self, card, i)
-        if not self._quest_jokers then
-            self._quest_jokers = {"hearts_quest", "spades_quest", "diamonds_quest", "clubs_quest"}
+        if i == 1 then
+            return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_hearts_quest")
+        elseif i == 2 then
+            return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_spades_quest")
+        elseif i == 3 then
+            return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_diamonds_quest")
+        elseif i == 4 then
+            return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_clubs_quest")
         end
-        local key = self._quest_jokers[i] or self._quest_jokers[1]
-        return { set = "Joker", area = G.pack_cards, skip_materialize = true, soulable = true, key = key }
     end
 }
