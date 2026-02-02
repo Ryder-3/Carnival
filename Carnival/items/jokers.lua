@@ -1,4 +1,6 @@
 
+
+
 --Test Joker (use this as a template for new jokers)
 --[[SMODS.Joker{
     key = "test_joker",
@@ -42,7 +44,6 @@
 }]]
 
 
-
 --GDUMP
 --TODO GET RID OF THIS AFTER DEV IS DONE
 SMODS.Joker{
@@ -56,7 +57,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage("[Carnival] G DUMP: "..dump(G.GAME))        
+        sendInfoMessage('[Carnival] G.GAME is currently' .. inspect(G.GAME))        
     end
 }
 

@@ -28,16 +28,10 @@ SMODS.Booster {
     },
     
     create_card = function(self, card, i)
-        -- Build a list of quest jokers that are NOT owned
-        local available_quests = {}
-        local quest_suits = {"hearts", "spades", "clubs", "diamonds"}  
-        for _, joker in ipairs(quest_suits) do
-            if tablecontains(G.jokersn, "j_"..joker.."_quest") then
-                table.insert(available_quests, joker)
-            else
-                table.insert(available_quests, "j_joker")
-            end
+        if not self._quest_jokers then
+            self._quest_jokers = {"hearts_quest", "spades_quest", "diamonds_quest", "clubs_quest"}
         end
-        return create_card("Joker", G.pack_cards, nil, nil, true, true, available_quests[i], nil)
+        local key = self._quest_jokers[i] or self._quest_jokers[1]
+        return { set = "Joker", area = G.pack_cards, skip_materialize = true, soulable = true, key = key }
     end
 }
