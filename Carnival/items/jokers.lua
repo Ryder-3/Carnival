@@ -43,25 +43,7 @@
     end,
 }]]
 
-
---GDUMP
---TODO GET RID OF THIS AFTER DEV IS DONE
-SMODS.Joker{
-    key = "G_DUMP",
-    atlas = "atlas_temp_jokers",
-    pos = {x = 0, y = 0},
-    loc_txt = {
-        name = "G DUMP",
-        text = {
-            "Upon getting this joker, G will be dumped into the console"
-        }
-    },
-    add_to_deck = function()
-        sendInfoMessage('[Carnival] G.GAME is currently' .. inspect(G.GAME))        
-    end
-}
-
--- Hearts quest joker
+-- Hearts Hunger
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name and Art: OBJ_Lily
@@ -138,7 +120,7 @@ SMODS.Joker{
     end
 }
 
--- Spades quest joker
+-- Spades Slobberer
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
@@ -214,7 +196,7 @@ SMODS.Joker{
         end
     end
 }
--- Diamonds quest joker
+-- Diamonds Devourer
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
@@ -290,7 +272,7 @@ SMODS.Joker{
         end
     end
 }
--- Clubs quest joker
+-- Clubs Consumer
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
@@ -300,7 +282,7 @@ SMODS.Joker{
     atlas = "atlas_temp_jokers",
     pos = { x = 0, y = 0 },
     loc_txt = {
-        name = "Clubss Consumer",
+        name = "Clubs Consumer",
         text = {
             "After playing #2# club cards",
             "Scored clubs give {X:dark_edition,C:white}^#3#{} chips and mult",
