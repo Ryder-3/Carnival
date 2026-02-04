@@ -1,5 +1,5 @@
 -- All of these jokers dump a different table into the console. 
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "G_DUMP",
     atlas = "atlas_temp_jokers",
     pos = {x = 0, y = 0},
@@ -60,3 +60,4 @@ SMODS.Joker{
         end
     end
 }
+]]--
