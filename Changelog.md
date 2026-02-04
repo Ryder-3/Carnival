@@ -1,0 +1,21 @@
+# [12/15/2025]
+## Additions
+Made quest jokers obtainable by opening a quest pack, this pack will only show unowned quest jokers
+
+# [12/9/2025]
+## Additions
+Finished the logic for making progress on the Heart's quest joker
+
+## Additions
+Finished the first version for the logic of all four quest jokers
+
+# [12/8/2025]
+## Additions
+Added a first test joker and started working on the quest jokers
+Added the "Quest" rarity. Cards of this rarity can't be found outside of quest packs (to be added)
+Added an initial sprite sheet with a placeholder joker.
+
+# Change Log
+
+Any and all changes to this mod can be found here!
+
