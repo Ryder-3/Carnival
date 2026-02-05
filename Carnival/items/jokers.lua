@@ -47,7 +47,6 @@
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name and Art: OBJ_Lily
--- TODO come up with a better name and quest
 SMODS.Joker{
     key = "hearts_quest",
     atlas = "atlas_jokers",
@@ -124,7 +123,6 @@ SMODS.Joker{
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
--- TODO come up with a better name and quest
 SMODS.Joker{
     key = "spades_quest",
     atlas = "atlas_temp_jokers",
@@ -200,7 +198,6 @@ SMODS.Joker{
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
--- TODO come up with a better name and quest
 SMODS.Joker{
     key = "diamonds_quest",
     atlas = "atlas_temp_jokers",
@@ -276,7 +273,6 @@ SMODS.Joker{
 -- Idea: Ryder
 -- Coder: Ryder
 -- Name: OBJ_Lily
--- TODO come up with a better name and quest
 SMODS.Joker{
     key = "clubs_quest",
     atlas = "atlas_temp_jokers",
@@ -349,10 +345,9 @@ SMODS.Joker{
     end
 }
 
---Pity system joker
---idea Ryder
--- coder Ryder
-
+-- Pity System
+-- Idea Ryder
+-- Coder Ryder
 -- TODO: Make a system that will actually calculate the death streak
 --[[SMODS.joker {
     key = "pity_system",
