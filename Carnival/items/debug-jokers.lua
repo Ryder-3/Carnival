@@ -1,4 +1,4 @@
--- All of these jokers dump a different table into the console. 
+-- All of these jokers dump a different table into the console.
 --[[SMODS.Joker{
     key = "G_DUMP",
     atlas = "atlas_temp_jokers",
@@ -10,7 +10,7 @@
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G is currently ' .. inspect(G))        
+        sendInfoMessage('[Carnival] G is currently ' .. inspect(G))
     end
 }
 SMODS.Joker{
@@ -24,7 +24,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G.jokers is currently ' .. inspect(G.jokers))        
+        sendInfoMessage('[Carnival] G.jokers is currently ' .. inspect(G.jokers))
     end
 }
 --G.jokers.cards just stores the number of owned jokers. seemingly can't get anything else from this.
@@ -39,7 +39,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G.jokers.cards is currently ' .. inspect(G.jokers.cards))        
+        sendInfoMessage('[Carnival] G.jokers.cards is currently ' .. inspect(G.jokers.cards))
     end
 }
 
@@ -60,4 +60,4 @@ SMODS.Joker{
         end
     end
 }
-]]--
+]] --

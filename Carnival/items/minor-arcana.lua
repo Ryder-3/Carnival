@@ -4,8 +4,8 @@ SMODS.ConsumableType {
     primary_colour = G.C.CHIPS,
     secondary_colour = G.C.MULT,
     shop_rate = 2,
-    loc_txt = {collection = "Minor Arcana", name = "Minor Arcana"},
-    collection_rows = { 4 , 4 },
+    loc_txt = { collection = "Minor Arcana", name = "Minor Arcana" },
+    collection_rows = { 4, 4 },
 }
 
 --This is a test Consumable. Remember to get rid of it.
@@ -16,12 +16,12 @@ SMODS.Consumable {
         name = "Test Minor Arcana",
         text = {
             "hopefully, this levels up 2s",
-            "I would be suprised though, I havent coded that part yet."   
+            "I would be suprised though, I havent coded that part yet."
         }
     },
     atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0},
+    pos = { x = 0, y = 0 },
     use = function(self, card, area, copier)
-        sendDebugMessage("[Carnival] the test consumable worked!")        
+        sendDebugMessage("[Carnival] the test consumable worked!")
     end
 }

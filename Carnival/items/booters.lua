@@ -70,6 +70,10 @@ SMODS.Booster {
 
             return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_clubs_quest")
 
+        else
+
+            return create_card("Joker", G.pack_cards, nil, nil, true, true, "j_joker")
         end
+
     end
 }
