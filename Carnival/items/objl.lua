@@ -2,7 +2,7 @@
 -- Idea: Ryder
 -- Coder: Ryder
 -- Art: OBJ_Lily
--- As long as this joker is owned, the player has a negative consumable that allows them to merge two jokers into an amalgam.
+-- As long as this joker is owned, the player has twosuits negative consumables that allowed them to merge two jokers into an amalgam and rip a joker out of an amalgam.
 -- An amalgam has alll abilities of the jokers used to create it.
 -- An amalgam can have up to six jokers in it.
 -- The values of the jokers in an amalgam are doubled for each joker in it.
@@ -27,6 +27,8 @@ SMODS.Joker {
         SMODS.add_card({key = "c_carnival_objl_seal_of_destruction", G.consumeables})
     end,
 
+
+    -- SMODS.find_card() returns an array of all cards with the given key.
     remove_from_deck = function(self, card)
         SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_creation")[1], true)
         SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_destruction")[1], true)
@@ -43,16 +45,43 @@ SMODS.Joker {
         name = "Amalgam",
         text = {
             "An amalgam of jokers.",
+            "Can hold up to #2# jokers.",
+            "Currently #1#/#2# slots used.",
+            "",
+            "You can rip up to #4# jokers out of this amalgam.",
+            "Currently #3#/#4# rips used."
         }
     },
+    -- TODO: Make the art of the Amalgam update to show the jokers inside of it
     -- TODO: Make the amalgam have and show the effects of the jokers in it
     -- TODO: Make the values of the interted jokers double for each joker in the amalgam
     -- TODO: Track the number of times an amalgam has been ripped apart
     config = {
         extra = {
-            stored_jokers = {},
+            stored_jokers = {"Empty", "Empty", "Empty", "Empty", "Empty", "Empty"},
+            current_slot = 1,
+            used_slots = 0,
+            available_slots = 6,
+            used_rips = 0,
+            available_rips = 3,
+
         },
     },
+    loc_vars = function(self, info_queue, card)
+
+
+        return {
+            vars = {
+                card.ability.used_slots,
+                card.ability.available_slots,
+                card.ability.used_rips,
+                card.ability.available_rips,
+                --Not sure this is going to do anything
+                card.ability.stored_jokers,
+                card.ability.current_slot,
+            }
+        }
+    end,
 }
 
 
@@ -79,10 +108,23 @@ G.FUNCS.carnival_merge_jokers = function(e)
                 joker_2 = SMODS.find_card(joker_2.config.center.key)[1]
             end
 
-            -- Create a new amalgam and store the selected jokers in it
+-- Create a new amalgam and store the selected jokers in it
             -- TODO: Make sure if an amalgam and a normal joker are selected, the normal joker is added to the amalgam
             local amalgam = create_card("Joker", G.jokers, nil, nil, true, true, "j_carnival_objl_amalgam")
-            amalgam.config.center.stored_jokers = {joker_1, joker_2}
+            sendDebugMessage("[Carnival] Check 1: " .. inspect(amalgam.config.center))
+            --TODO: FIND BROKE THING
+
+            amalgam.config.center.ability.stored_jokers[amalgam.config.center.ability.current_slot] = joker_1
+            amalgam.config.center.ability.current_slot = amalgam.config.center.ability.current_slot + 1
+            amalgam.config.center.ability.used_slots = amalgam.config.center.ability.used_slots + 1 
+            sendDebugMessage("[Carnival] Check 2: " .. inspect(amalgam.config.center))
+           
+
+            amalgam.config.center.ability.stored_jokers[amalgam.config.center.ability.current_slot] = joker_2
+            amalgam.config.center.ability.current_slot = amalgam.config.center.ability.current_slot + 1
+            amalgam.config.center.ability.used_slots = amalgam.config.center.ability.used_slots + 1
+            sendDebugMessage("[Carnival] Check 3: " .. inspect(amalgam.config.center))
+            
             G.jokers:emplace(amalgam)
 
             -- Remove the selected jokers from G.jokers
@@ -123,7 +165,7 @@ SMODS.Consumable {
                     highlight_limit = 2,
                     card_limit = #G.jokers.cards - 1,
                 })
-                G.Carnival.Merge_area.config.card_limits.extra_slots_used = 0 --For some reason, the card limit is not being set correctly, so we need to set it manually
+                G.Carnival.Merge_area.config.card_limits.extra_slots_used = 0 --For some reason, this is not being set correctly, so we need to set it manually
                 -- Get all jokers that are not OBJ_L and add them to the merge area
                 for i = 1, #G.jokers.cards do
                     local joker = G.jokers.cards[i]
