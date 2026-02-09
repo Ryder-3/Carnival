@@ -9,6 +9,7 @@
 -- An amalgam has any and all powerups (negative, holographic, etc.) of the jokers used to create it.
 -- You can rip a joker out of an amalgam to get back the joker you ripped out.
 -- You can only rip a joker out of an amalgam three times before it is destroyed.
+
 SMODS.Joker {
     key = "objl",
     atlas = "atlas_temp_jokers",
@@ -43,7 +44,12 @@ SMODS.Joker {
         text = {
             "An amalgam of jokers.",
         }
-    }
+    },
+    config = {
+        extra = {
+            stored_jokers = {},
+        },
+    },
 }
 
 
@@ -68,12 +74,53 @@ SMODS.Consumable {
         end
     end,
     use = function(self, card, area, copier)
-        sendDebugMessage("[Carnival] the objl seal of creation worked!") --Test code
-        SMODS.add_card({key = "j_carnival_objl_amalgam", G.jokers}) -- Test code
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                -- Make an area to store all the jokers that are not OBJ_L"
+                local merge_area = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
+                    type = "joker",
+                    highlight_limit = 2,
+                    card_limit = #G.jokers.cards - 1,
+                })
+                merge_area.config.card_limits.extra_slots_used = 0 --For some reason, the card limit is not being set correctly, so we need to set it manually
+                -- Get all jokers that are not OBJ_L and add them to the merge area
+                for i = 1, #G.jokers.cards do
+                    local joker = G.jokers.cards[i]
+                    if joker.config and joker.config.center and joker.config.center.key ~= "j_carnival_objl" then
+                        local copy = copy_card(joker) -- We need to copy the joker so that we can add it to the merge area without affecting the original joker
+                        
+                        -- For now, we can still sell the jokers in the merge area, so we need to set the cost to 0 so there's no benifit to selling them
+                        -- in the future, I'd like to find some way to make the jokers in the merge area not sellable, but I'm not sure how to do that yet
+                        copy.cost = 0
+                        copy.sell_cost = 0
+                        copy.sell_cost_label = (copy.facing == 'back' and '?') or 0
+
+                        merge_area:emplace(copy)
+                    end
+                end
+
+                -- Display the merge area in an overlay menu
+                G.FUNCS.overlay_menu({
+                    definition = create_UIBox_generic_options({
+                        contents = {
+                            {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
+                                {n = G.UIT.O, config = {object = merge_area}}
+                            }}
+                        },
+                    }),
+                })
+                return true
+            end
+        }))
     end,
     keep_on_use = function(self, card)
         return true
-    end
+    end,
+    eternal_compat = true,
+    add_to_deck = function(self, card)
+        card:set_eternal(true)
+        card:set_edition('e_negative', true, true)
+    end,
 }
 
 -- To keep with the consistency of jokers not having any buttons, we need to create a consumable that allows the player to rip a joker out of an amalgam.
@@ -96,9 +143,14 @@ SMODS.Consumable {
         end
     end,
     use = function(self, card, area, copier)
-        sendDebugMessage("[Carnival] the objl seal of destruction worked!")
+        sendDebugMessage("[Carnival] the objl seal of destruction worked!") --Test code
     end,
     keep_on_use = function(self, card)
         return true
-    end
+    end,
+    eternal_compat = true,
+    add_to_deck = function(self, card)
+        card:set_eternal(true)
+        card:set_edition('e_negative', true, true)
+    end,
 }

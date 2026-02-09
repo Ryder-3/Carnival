@@ -55,7 +55,7 @@ SMODS.Joker{
         name = "Hearts Hunger",
         text = {
             "After playing #2# heart cards",
-            "Scored hearts give {X:dark_edition,C:white}^#3#{} chips and mult",
+            "Scored {C:hearts}hearts{} give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -131,7 +131,7 @@ SMODS.Joker{
         name = "Spades Slobberer",
         text = {
             "After playing #2# spade cards",
-            "scored spades give {X:dark_edition,C:white}^#3#{} chips and mult",
+            "scored {C:spades}spades{} give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -206,7 +206,7 @@ SMODS.Joker{
         name = "Diamonds Devourer",
         text = {
             "After playing #2# diamond cards",
-            "scored diamonds give {X:dark_edition,C:white}^#3#{} chips and mult",
+            "scored {C:diamonds}diamonds{} give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
@@ -281,7 +281,7 @@ SMODS.Joker{
         name = "Clubs Consumer",
         text = {
             "After playing #2# club cards",
-            "Scored clubs give {X:dark_edition,C:white}^#3#{} chips and mult",
+            "Scored {C:clubs}clubs{} give {X:dark_edition,C:white}^#3#{} chips and mult",
             "Currently #1#/#2#"
         }
     },
