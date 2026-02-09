@@ -5,7 +5,7 @@ sendInfoMessage("[Carnival] Loading Carnival Mod...")
 
 -- Get the current mod object
 local carnival_mod = SMODS.current_mod
-
+G.Carnival = {}
 
 -- Helper function to load all Lua files from a directory
 local function load_directory(path)

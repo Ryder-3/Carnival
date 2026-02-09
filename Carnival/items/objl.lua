@@ -28,8 +28,8 @@ SMODS.Joker {
     end,
 
     remove_from_deck = function(self, card)
-        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_creation"), true)
-        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_destruction"), true)
+        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_creation")[1], true)
+        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_destruction")[1], true)
     end,
 
 }
@@ -45,6 +45,9 @@ SMODS.Joker {
             "An amalgam of jokers.",
         }
     },
+    -- TODO: Make the amalgam have and show the effects of the jokers in it
+    -- TODO: Make the values of the interted jokers double for each joker in the amalgam
+    -- TODO: Track the number of times an amalgam has been ripped apart
     config = {
         extra = {
             stored_jokers = {},
@@ -52,6 +55,43 @@ SMODS.Joker {
     },
 }
 
+
+-- Function to merge the selected jokers into an amalgam
+G.FUNCS.carnival_merge_jokers = function(e)
+    
+    if #G.Carnival.Merge_area.highlighted == 2 then
+        -- TODO: Make sure that the amount of jokers in the amalgam is not greater than 6
+        -- TODO: Add error messages for when the merge fails (if there are too many jokers in the amalgam, or if both jokers are amalgams)
+        -- Make sure that two amalgams are not selected
+        if not (G.Carnival.Merge_area.highlighted[1].config.center.key == "j_carnival_objl_amalgam" and G.Carnival.Merge_area.highlighted[2].config.center.key == "j_carnival_objl_amalgam") then
+
+            -- Store the selected jokers then close the overlay menu
+            local joker_1 = G.Carnival.Merge_area.highlighted[1]
+            local joker_2 = G.Carnival.Merge_area.highlighted[2]
+            G.FUNCS.exit_overlay_menu()
+
+            -- SMODS.find_card returns a table, so we need to get the first and second jokers if the same joker is selected twice
+            if joker_1.config.center.key == joker_2.config.center.key then
+                joker_1 = SMODS.find_card(joker_1.config.center.key)[1]
+                joker_2 = SMODS.find_card(joker_1.config.center.key)[2]
+            else
+                joker_1 = SMODS.find_card(joker_1.config.center.key)[1]
+                joker_2 = SMODS.find_card(joker_2.config.center.key)[1]
+            end
+
+            -- Create a new amalgam and store the selected jokers in it
+            -- TODO: Make sure if an amalgam and a normal joker are selected, the normal joker is added to the amalgam
+            local amalgam = create_card("Joker", G.jokers, nil, nil, true, true, "j_carnival_objl_amalgam")
+            amalgam.config.center.stored_jokers = {joker_1, joker_2}
+            G.jokers:emplace(amalgam)
+
+            -- Remove the selected jokers from G.jokers
+            SMODS.destroy_cards(joker_1, true)
+            SMODS.destroy_cards(joker_2, true)
+
+        end
+    end
+end
 
 -- In base Balatro, you can't select multiple jokers, so we need to create a consumable that allows the player to merge two jokers into an amalgam.
 SMODS.Consumable {
@@ -76,13 +116,14 @@ SMODS.Consumable {
     use = function(self, card, area, copier)
         G.E_MANAGER:add_event(Event({
             func = function()
+                
                 -- Make an area to store all the jokers that are not OBJ_L"
-                local merge_area = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
+                G.Carnival.Merge_area = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
                     type = "joker",
                     highlight_limit = 2,
                     card_limit = #G.jokers.cards - 1,
                 })
-                merge_area.config.card_limits.extra_slots_used = 0 --For some reason, the card limit is not being set correctly, so we need to set it manually
+                G.Carnival.Merge_area.config.card_limits.extra_slots_used = 0 --For some reason, the card limit is not being set correctly, so we need to set it manually
                 -- Get all jokers that are not OBJ_L and add them to the merge area
                 for i = 1, #G.jokers.cards do
                     local joker = G.jokers.cards[i]
@@ -95,7 +136,7 @@ SMODS.Consumable {
                         copy.sell_cost = 0
                         copy.sell_cost_label = (copy.facing == 'back' and '?') or 0
 
-                        merge_area:emplace(copy)
+                        G.Carnival.Merge_area:emplace(copy)
                     end
                 end
 
@@ -104,7 +145,10 @@ SMODS.Consumable {
                     definition = create_UIBox_generic_options({
                         contents = {
                             {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
-                                {n = G.UIT.O, config = {object = merge_area}}
+                                {n = G.UIT.O, config = {object = G.Carnival.Merge_area}},
+                                {n = G.UIT.C, config = {button = "carnival_merge_jokers", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true}, nodes = {
+                                    {n = G.UIT.T, config = {text = "Merge",align = "cm", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+                                }}
                             }}
                         },
                     }),
@@ -112,6 +156,7 @@ SMODS.Consumable {
                 return true
             end
         }))
+
     end,
     keep_on_use = function(self, card)
         return true
