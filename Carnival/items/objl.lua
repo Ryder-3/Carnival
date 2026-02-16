@@ -49,7 +49,8 @@ SMODS.Joker {
             "Currently #1#/#2# slots used.",
             "",
             "You can rip up to #4# jokers out of this amalgam.",
-            "Currently #3#/#4# rips used."
+            "Currently #3#/#4# rips used.",
+            
         }
     },
     -- TODO: Make the art of the Amalgam update to show the jokers inside of it
@@ -58,7 +59,7 @@ SMODS.Joker {
     -- TODO: Track the number of times an amalgam has been ripped apart
     config = {
         extra = {
-            stored_jokers = {"Empty", "Empty", "Empty", "Empty", "Empty", "Empty"},
+            stored_jokers = {nil, nil, nil, nil, nil, nil},
             current_slot = 1,
             used_slots = 0,
             available_slots = 6,
@@ -72,13 +73,13 @@ SMODS.Joker {
 
         return {
             vars = {
-                card.ability.used_slots,
-                card.ability.available_slots,
-                card.ability.used_rips,
-                card.ability.available_rips,
+                card.ability.extra.used_slots,
+                card.ability.extra.available_slots,
+                card.ability.extra.used_rips,
+                card.ability.extra.available_rips,
                 --Not sure this is going to do anything
-                card.ability.stored_jokers,
-                card.ability.current_slot,
+                card.ability.extra.stored_jokers,
+                card.ability.extra.current_slot,
             }
         }
     end,
@@ -92,48 +93,88 @@ G.FUNCS.carnival_merge_jokers = function(e)
         -- TODO: Make sure that the amount of jokers in the amalgam is not greater than 6
         -- TODO: Add error messages for when the merge fails (if there are too many jokers in the amalgam, or if both jokers are amalgams)
         -- Make sure that two amalgams are not selected
-        if not (G.Carnival.Merge_area.highlighted[1].config.center.key == "j_carnival_objl_amalgam" and G.Carnival.Merge_area.highlighted[2].config.center.key == "j_carnival_objl_amalgam") then
+        if not (G.Carnival.Merge_area.highlighted[1].config.center_key == "j_carnival_objl_amalgam" and G.Carnival.Merge_area.highlighted[2].config.center_key == "j_carnival_objl_amalgam") then
 
             -- Store the selected jokers then close the overlay menu
             local joker_1 = G.Carnival.Merge_area.highlighted[1]
             local joker_2 = G.Carnival.Merge_area.highlighted[2]
-            G.FUNCS.exit_overlay_menu()
+            -- Makes sure that, if joker_1 is an amalgam, it still has free slots
+            if not (joker_1.config.center_key == "j_carnival_objl_amalgam" and joker_1.ability.extra.used_slots == 6) then
+                -- Makes sure that, if joker_2 is an amalgam, it still has free slots
+                if not (joker_2.config.center_key == "j_carnival_objl_amalgam" and joker_2.ability.extra.used_slots == 6) then
+                
 
-            -- SMODS.find_card returns a table, so we need to get the first and second jokers if the same joker is selected twice
-            if joker_1.config.center.key == joker_2.config.center.key then
-                joker_1 = SMODS.find_card(joker_1.config.center.key)[1]
-                joker_2 = SMODS.find_card(joker_1.config.center.key)[2]
-            else
-                joker_1 = SMODS.find_card(joker_1.config.center.key)[1]
-                joker_2 = SMODS.find_card(joker_2.config.center.key)[1]
+                    G.FUNCS.exit_overlay_menu()
+
+                    -- SMODS.find_card returns a table, so we need to get the first and second jokers if the same joker is selected twice
+                    if joker_1.config.center_key == joker_2.config.center_key then
+                        local found_jokers = SMODS.find_card(joker_1.config.center_key)
+                        joker_1 = found_jokers[1]
+                        joker_2 = found_jokers[2]
+                    else
+                        joker_1 = SMODS.find_card(joker_1.config.center_key)[1]
+                        joker_2 = SMODS.find_card(joker_2.config.center_key)[1]
+                    end
+
+                    
+
+                    -- If either of the selected jokers is an amalgam, the other joker is inserted into it. Otherwise, a new amalgam is made,
+                    -- and both jokers are inserted into it.
+
+                    if joker_1.config.center_key == "j_carnival_objl_amalgam" then
+
+                        -- This looks really bad, but all it does is take the non-amalgam joker's center and stores it in the amalgam's 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+                        joker_1.ability.extra.stored_jokers[joker_1.ability.extra.current_slot] = joker_2.config.center
+                        sendDebugMessage("[Carnival] joker_1.config.center.config.extra.stored_jokers[joker_1.config.center.config.extra.current_slot]: \n" .. inspectDepth(joker_1.config.center.config.extra.stored_jokers[joker_1.config.center.config.extra.current_slot], 4, 5))
+                        joker_1.ability.extra.current_slot = joker_1.ability.extra.current_slot + 1
+                        joker_1.ability.extra.used_slots = joker_1.ability.extra.used_slots + 1
+
+                        SMODS.destroy_cards(joker_2)
+                    
+                    elseif joker_2.config.center_key == "j_carnival_objl_amalgam" then
+
+                        -- This looks really bad, but all it does is take the non-amalgam joker's center and stores it in the amalgam's 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+                        joker_2.ability.extra.stored_jokers[joker_2.ability.extra.current_slot] = joker_1.config.center
+                        sendDebugMessage("[Carnival] joker_2.ability.extra.stored_jokers[joker_2.ability.extra.current_slot]: \n" .. inspectDepth(joker_2.ability.extra.stored_jokers[joker_2.ability.extra.current_slot], 4, 5))
+                        joker_2.ability.extra.current_slot = joker_2.ability.extra.current_slot + 1
+                        joker_2.ability.extra.used_slots = joker_2.ability.extra.used_slots + 1
+
+                        SMODS.destroy_cards(joker_1)
+
+                    else
+                        local amalgam = create_card("Joker", G.jokers, nil, nil, true, true, "j_carnival_objl_amalgam")
+
+                        sendDebugMessage("[Carnival] amalgam.ability.extra: " .. inspectDepth(amalgam.ability.extra, 4, 5))
+                        -- This looks really bad, but all it does is take both jokers and store their centers in the amalgams 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+                        amalgam.ability.extra.stored_jokers[amalgam.ability.extra.current_slot] = joker_1.config.center
+                        
+                        amalgam.ability.extra.current_slot = amalgam.ability.extra.current_slot + 1
+                        amalgam.ability.extra.used_slots = amalgam.ability.extra.used_slots + 1 
+                    
+
+                        amalgam.ability.extra.stored_jokers[amalgam.ability.extra.current_slot] = joker_2.config.center
+                        
+                        amalgam.ability.extra.current_slot = amalgam.ability.extra.current_slot + 1
+                        amalgam.ability.extra.used_slots = amalgam.ability.extra.used_slots + 1
+                        
+                        sendDebugMessage("[Carnival] amalgam.ability.extra: " .. inspectDepth(amalgam.ability.extra, 4, 5))
+
+                        G.jokers:emplace(amalgam)
+
+                        -- Remove the selected jokers from G.jokers
+                        SMODS.destroy_cards(joker_1, true)
+                        SMODS.destroy_cards(joker_2, true)
+                    end
+                end
             end
-
--- Create a new amalgam and store the selected jokers in it
-            -- TODO: Make sure if an amalgam and a normal joker are selected, the normal joker is added to the amalgam
-            local amalgam = create_card("Joker", G.jokers, nil, nil, true, true, "j_carnival_objl_amalgam")
-            sendDebugMessage("[Carnival] Check 1: " .. inspect(amalgam.config.center))
-            --TODO: FIND BROKE THING
-
-            amalgam.config.center.ability.stored_jokers[amalgam.config.center.ability.current_slot] = joker_1
-            amalgam.config.center.ability.current_slot = amalgam.config.center.ability.current_slot + 1
-            amalgam.config.center.ability.used_slots = amalgam.config.center.ability.used_slots + 1 
-            sendDebugMessage("[Carnival] Check 2: " .. inspect(amalgam.config.center))
-           
-
-            amalgam.config.center.ability.stored_jokers[amalgam.config.center.ability.current_slot] = joker_2
-            amalgam.config.center.ability.current_slot = amalgam.config.center.ability.current_slot + 1
-            amalgam.config.center.ability.used_slots = amalgam.config.center.ability.used_slots + 1
-            sendDebugMessage("[Carnival] Check 3: " .. inspect(amalgam.config.center))
-            
-            G.jokers:emplace(amalgam)
-
-            -- Remove the selected jokers from G.jokers
-            SMODS.destroy_cards(joker_1, true)
-            SMODS.destroy_cards(joker_2, true)
-
         end
     end
 end
+
+
 
 -- In base Balatro, you can't select multiple jokers, so we need to create a consumable that allows the player to merge two jokers into an amalgam.
 SMODS.Consumable {
