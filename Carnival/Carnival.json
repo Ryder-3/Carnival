@@ -6,7 +6,7 @@
     "description" : "A Cryptid addon with the focus of making the game even more chaotic.",
     "prefix" : "carnival",
     "main_file" : "Carnival.lua",
-    "priority" : 0,
+    "priority" : 115,
     "badge_colour" : "",
     "badge_text_colour" : "",
     "version" : "0.0.1",

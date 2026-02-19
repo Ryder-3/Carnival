@@ -1,0 +1,536 @@
+-- Joker: OBJ_L: Creation Incarnate
+-- Idea: Ryder
+-- Coder: Ryder
+-- Art: OBJ_Lily
+-- As long as this joker is owned, the player has twosuits negative consumables that allowed them to merge two jokers into an amalgam and rip a joker out of an amalgam.
+-- An amalgam has alll abilities of the jokers used to create it.
+-- An amalgam can have up to six jokers in it.
+-- The values of the jokers in an amalgam are doubled for each joker in it.
+-- An amalgam has any and all powerups (negative, holographic, etc.) of the jokers used to create it.
+-- You can rip a joker out of an amalgam to get back the joker you ripped out.
+-- You can only rip a joker out of an amalgam three times before it is destroyed.
+
+--Helper function to create a new invisable card area for the jokers to be stored in
+local ensure_invis_card_area = function()
+    if G.GAME.invis_card_area then return end
+    local area = CardArea(
+        G.ROOM.T.x + 100000,
+        G.ROOM.T.y + 100000,
+        0, 0,
+        {
+            type = "joker",
+            card_limit = 999,
+            highlight_limit = 0,
+            visable = false,
+            no_ui = true
+        }
+    )
+    area.states.visible = false
+
+    function area:draw() end
+
+    G.GAME.invis_card_area = area
+end
+
+if not G.FUNCS then G.FUNCS = {} end
+-- Helper function to search invisable card area made by amalgams, like SMODS.find_card() but for the invisable card area
+G.FUNCS.search_invis_area = function (key)
+    if not G.GAME.invis_card_area or not G.GAME.invis_card_area.cards then return end
+    local results = {}
+    for _, card in pairs(G.GAME.invis_card_area.cards) do
+        if card and type(card) == 'table' and card.config and (card.config.center_key == key or (card.config.center and card.config.center.key == key)) then
+            table.insert(results, card)
+        end
+    end
+    return results
+end
+
+
+-- TEST
+SMODS.Joker{
+    key = "feature_test",
+    atlas = "atlas_temp_jokers",
+    pos = {x = 0, y = 0},
+    loc_txt = {
+        name = "Feature Test Joker",
+        text = {
+            "Upon obtaining this joker... something will happon",
+            "something = sendDebugMessage(inspectdeapth(this joker)))"
+        }
+    },
+    add_to_deck = function()
+        local joker = SMODS.find_card('j_carnival_feature_test')[1]
+        sendDebugMessage(inspectDepth(joker,4,5))
+    end
+}
+
+
+--OBJ_L joker
+SMODS.Joker {
+    key = "objl",
+    atlas = "atlas_temp_jokers",
+    pos = { x = 0, y = 0 },
+    loc_txt = {
+        name = "OBJ_L: Creation Incarnate",
+        text = {
+            "Grants the {C:attention}Seal of Creation{} and {C:attention}Seal of Destruction{} while owned.",
+
+        }
+    },
+
+    add_to_deck = function(self, card)
+        SMODS.add_card({key = "c_carnival_objl_seal_of_creation", G.consumeables})
+        SMODS.add_card({key = "c_carnival_objl_seal_of_destruction", G.consumeables})
+        ensure_invis_card_area()
+    end,
+
+
+    -- SMODS.find_card() returns an array of all cards with the given key.
+    remove_from_deck = function(self, card)
+        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_creation")[1], true)
+        SMODS.destroy_cards(SMODS.find_card("c_carnival_objl_seal_of_destruction")[1], true)
+    end,
+
+}
+
+--Amalgam joker
+SMODS.Joker {
+    key = "objl_amalgam",
+    atlas = "atlas_temp_jokers",
+    pos = { x = 0, y = 0 },
+    no_collection = true,
+    loc_txt = {
+        name = "Amalgam",
+        text = {
+            "An amalgam of jokers.",
+            "Can hold up to #2# jokers.",
+            "Currently #1#/#2# slots used.",
+            "",
+            "You can rip up to #4# jokers out of this amalgam.",
+            "Currently #3#/#4# rips used.",
+            
+        }
+    },
+    -- TODO: I can see bad things happening if there are duplicate jokers in the invis_card_area
+    -- TODO: Make the art of the Amalgam update to show the jokers inside of it
+    -- TODO: Make the values of the interted jokers double for each joker in the amalgam
+    -- TODO: Track the number of times an amalgam has been ripped apart
+    config = {
+        extra = {
+            stored_joker_keys = {nil, nil, nil, nil, nil, nil},
+            current_slot = 1,
+            used_slots = 0,
+            available_slots = 6,
+            used_rips = 0,
+            available_rips = 3,
+
+        },
+    },
+    remove_from_deck = function(self, card, from_debuff)
+        sendDebugMessage("[Carnival] removing amalgam from deck")
+        for i = 1, #card.ability.extra.stored_joker_keys do
+            if card.ability.extra.stored_joker_keys[i] then
+                local found = G.FUNCS.search_invis_area(card.ability.extra.stored_joker_keys[i])
+                local joker = found and found[1]
+                if joker then
+                    SMODS.destroy_cards(joker, true)
+                    sendDebugMessage("[Carnival] joker " .. joker.config.center_key .. " destroyed")
+                end
+            end
+        end
+    end,
+
+    loc_vars = function(self, info_queue, card)
+
+        -- This displays tooltips on the side of the amalgam that show the jokers inside of it
+        for i = 1, card.ability.extra.used_slots do
+            local found = G.FUNCS.search_invis_area(card.ability.extra.stored_joker_keys[i])
+            local joker = found and found[1]
+            if joker and joker.config and joker.config.center_key then
+                info_queue[#info_queue+1] = G.P_CENTERS[joker.config.center_key]
+            end
+        end
+
+        return {
+            vars = {
+                card.ability.extra.used_slots,
+                card.ability.extra.available_slots,
+                card.ability.extra.used_rips,
+                card.ability.extra.available_rips,
+                card.ability.extra.stored_joker_keys,
+                card.ability.extra.current_slot,
+            }
+        }
+    end,
+}
+
+
+-- Function to merge the selected jokers into an amalgam
+G.FUNCS.carnival_merge_jokers = function(e)
+
+    if #G.Carnival.Merge_area.highlighted == 2 then
+        -- TODO: Make sure that the amount of jokers in the amalgam is not greater than 6
+        -- TODO: Add error messages for when the merge fails (if there are too many jokers in the amalgam, or if both jokers are amalgams)
+        -- Make sure that two amalgams are not selected
+        if not (G.Carnival.Merge_area.highlighted[1].config.center_key == "j_carnival_objl_amalgam" and G.Carnival.Merge_area.highlighted[2].config.center_key == "j_carnival_objl_amalgam") then
+
+            -- Store the selected jokers then close the overlay menu
+            local joker_1 = G.Carnival.Merge_area.highlighted[1].carnival_original_joker
+            local joker_2 = G.Carnival.Merge_area.highlighted[2].carnival_original_joker
+            -- Makes sure that, if joker_1 is an amalgam, it still has free slots
+            if not (joker_1.config.center_key == "j_carnival_objl_amalgam" and (joker_1.ability and joker_1.ability.extra and joker_1.ability.extra.used_slots and joker_1.ability.extra.used_slots == 6)) then
+                -- Makes sure that, if joker_2 is an amalgam, it still has free slots
+                if not (joker_2.config.center_key == "j_carnival_objl_amalgam" and (joker_2.ability and joker_2.ability.extra and joker_2.ability.extra.used_slots and joker_2.ability.extra.used_slots == 6)) then
+                    G.FUNCS.exit_overlay_menu()
+
+                    -- If either of the selected jokers is an amalgam, the other joker is inserted into it. Otherwise, a new amalgam is made,
+                    -- and both jokers are inserted into it.
+
+                    if joker_1.config.center_key == "j_carnival_objl_amalgam" then
+
+                        -- This looks really bad, but all it does is take the non-amalgam joker's center and stores it in the amalgam's 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+                        
+                        joker_1.ability.extra.stored_joker_keys[joker_1.ability.extra.current_slot] = joker_2.config.center_key
+                        joker_1.ability.extra.current_slot = joker_1.ability.extra.current_slot + 1
+                        joker_1.ability.extra.used_slots = joker_1.ability.extra.used_slots + 1
+
+                        -- Store the joker_2 in the invisable card area
+                        local joker_2_copy = copy_card(joker_2)
+                        G.GAME.invis_card_area:emplace(joker_2_copy)
+
+                        SMODS.destroy_cards(joker_2, true)
+
+                    
+                    elseif joker_2.config.center_key == "j_carnival_objl_amalgam" then
+
+                        -- This looks really bad, but all it does is take the non-amalgam joker's center and stores it in the amalgam's 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+                        joker_2.ability.extra.stored_joker_keys[joker_2.ability.extra.current_slot] = joker_1.config.center_key
+                        joker_2.ability.extra.current_slot = joker_2.ability.extra.current_slot + 1
+                        joker_2.ability.extra.used_slots = joker_2.ability.extra.used_slots + 1
+
+                        -- Store the joker_1 in the invisable card area
+                        local joker_1_copy = copy_card(joker_1)
+                        G.GAME.invis_card_area:emplace(joker_1_copy)
+
+                        SMODS.destroy_cards(joker_1, true)
+
+                    else
+                        local amalgam = create_card("Joker", G.jokers, nil, nil, true, true, "j_carnival_objl_amalgam")
+
+                        -- This looks really bad, but all it does is take both jokers and store their centers in the amalgams 'stored_jokers' table,
+                        -- then updates which slot is the next empty slot.
+
+                        --New idea, for each joker, we store their .ability table, then make a new joker with the new .ability table in the amalgam's own, invisable, card area
+
+                        
+                        amalgam.ability.extra.stored_joker_keys[amalgam.ability.extra.current_slot] = joker_1.config.center_key
+                        amalgam.ability.extra.current_slot = amalgam.ability.extra.current_slot + 1
+                        amalgam.ability.extra.used_slots = amalgam.ability.extra.used_slots + 1 
+
+                        amalgam.ability.extra.stored_joker_keys[amalgam.ability.extra.current_slot] = joker_2.config.center_key
+                        amalgam.ability.extra.current_slot = amalgam.ability.extra.current_slot + 1
+                        amalgam.ability.extra.used_slots = amalgam.ability.extra.used_slots + 1
+
+                        G.jokers:emplace(amalgam)
+                        amalgam:add_to_deck()
+
+                        local joker_1_copy = copy_card(joker_1)
+                        local joker_2_copy = copy_card(joker_2)
+                        G.GAME.invis_card_area:emplace(joker_1_copy)
+                        G.GAME.invis_card_area:emplace(joker_2_copy)
+
+                        SMODS.destroy_cards(joker_1, true)
+                        SMODS.destroy_cards(joker_2, true)
+
+
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- In base Balatro, you can't select multiple jokers, so we need to create a consumable that allows the player to merge two jokers into an amalgam.
+-- Seal of Creation consumable
+SMODS.Consumable {
+    key = "objl_seal_of_creation",
+    set = "carnival_abilities",
+    loc_txt = {
+        name = "Seal of Creation",
+        text = {
+            "Allows the player to merge two jokers into an {C:attention}amalgam{}.",
+            "An {C:attention}amalgam{} can have up to six jokers in it.",
+            "The values of the jokers in an {C:attention}amalgam{} are doubled for each joker in it.",
+        }
+    },
+    atlas = "atlas_temp_jokers",
+    pos = { x = 0, y = 0 },
+    -- OBJ_L can't be fused, so the seal can only be used when you have OBJ_L and two other jokers
+    can_use = function(self, card)
+        if #G.jokers.cards >= 3 then
+            return true
+        end
+    end,
+    use = function(self, card, area, copier)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                
+                -- Make an area to store all the jokers that are not OBJ_L"
+                G.Carnival.Merge_area = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
+                    type = "joker",
+                    highlight_limit = 2,
+                    card_limit = #G.jokers.cards - 1,
+                })
+                G.Carnival.Merge_area.config.card_limits.extra_slots_used = 0 --For some reason, this is not being set correctly, so we need to set it manually
+                -- Get all jokers that are not OBJ_L and add them to the merge area
+                for i = 1, #G.jokers.cards do
+                    local joker = G.jokers.cards[i]
+                    if joker.config and joker.config.center and joker.config.center.key ~= "j_carnival_objl" then
+                        local copy = copy_card(joker) -- We need to copy the joker so that we can add it to the merge area without affecting the original joker
+                        
+                        -- For now, we can still sell the jokers in the merge area, so we need to set the cost to 0 so there's no benifit to selling them
+                        -- in the future, I'd like to find some way to make the jokers in the merge area not sellable, but I'm not sure how to do that yet
+                        copy.cost = 0
+                        copy.sell_cost = 0
+                        copy.sell_cost_label = (copy.facing == 'back' and '?') or 0
+                        copy.carnival_original_joker = joker
+                        
+                        G.Carnival.Merge_area:emplace(copy)
+                    end
+                end
+
+                -- Display the merge area in an overlay menu
+                G.FUNCS.overlay_menu({
+                    definition = create_UIBox_generic_options({
+                        contents = {
+                            {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
+                                {n = G.UIT.O, config = {object = G.Carnival.Merge_area}},
+                                {n = G.UIT.C, config = {button = "carnival_merge_jokers", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true}, nodes = {
+                                    {n = G.UIT.T, config = {text = "Merge",align = "cm", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+                                }}
+                            }}
+                        },
+                    }),
+                })
+                return true
+            end
+        }))
+
+    end,
+    keep_on_use = function(self, card)
+        return true
+    end,
+    eternal_compat = true,
+    add_to_deck = function(self, card)
+        card:set_eternal(true)
+        card:set_edition('e_negative', true, true)
+    end
+}
+-- Returns a table with all the nil values removed
+local function fill_holes(table)
+    local new_table = {}
+    for _, value in pairs(table) do
+        new_table[#new_table+1] = value
+    end
+    return new_table
+end
+
+G.FUNCS.carnival_rip = function(e)
+    -- Button callbacks don't receive custom config (e.amalgam is nil), so we use the amalgam stored when opening the rip menu
+    local selected_amalgam = G.Carnival and G.Carnival.ripping_amalgam
+    if not selected_amalgam then return end
+
+    --We need to get the joker out of G.GAME.invis_card_area
+    --We need to get a copy of the joker into G.jokers
+    --We need to incrament amalgam.used_rips
+    --We need to decrease amalgam.used_slots
+    --We need amalgam.stored_joker_keys to have all the used slots on the left, and all the empty slots on the right
+    local selected_joker = G.Carnival.Ripping_menu.highlighted[1].carnival_original_joker
+    local outer_joker = copy_card(selected_joker)
+
+    -- Spawn at 0,0 so the joker doesn't inherit the invis area's off-screen position
+    outer_joker.T.x = 0
+    outer_joker.T.y = 0
+    outer_joker:hard_set_T()
+
+    --Put the outer joker into G.jokers
+    G.jokers:emplace(outer_joker)
+    outer_joker:add_to_deck()
+
+    --Remove the selected joker from the invisable card area
+    SMODS.destroy_cards(selected_joker, true)
+
+    --Remove the selected joker key from the amalgam's stored_joker_keys
+    for i = 1, 6 do
+        if selected_amalgam.ability and selected_amalgam.ability.extra and selected_amalgam.ability.extra.stored_joker_keys and selected_amalgam.ability.extra.stored_joker_keys[i] == selected_joker.config.center_key then
+            selected_amalgam.ability.extra.stored_joker_keys[i] = nil
+            selected_amalgam.ability.extra.used_slots = selected_amalgam.ability.extra.used_slots - 1
+            selected_amalgam.ability.extra.current_slot = selected_amalgam.ability.extra.current_slot - 1
+            selected_amalgam.ability.extra.stored_joker_keys = fill_holes(selected_amalgam.ability.extra.stored_joker_keys)
+            selected_amalgam.ability.extra.used_rips = selected_amalgam.ability.extra.used_rips + 1
+            if selected_amalgam.ability.extra.used_rips == selected_amalgam.ability.extra.available_rips then
+                SMODS.destroy_cards(selected_amalgam, true)
+            end
+            break
+        end
+    end
+    G.Carnival.ripping_amalgam = nil
+    G.FUNCS.exit_overlay_menu()
+end
+
+-- This function holds the creation of the ripping menu
+G.FUNCS.carnival_open_rip_menu = function(e)
+    G.Carnival = G.Carnival or {}
+    local selected_amalgam_copy = G.Carnival.Amalgam_menu and G.Carnival.Amalgam_menu.highlighted[1]
+    if not selected_amalgam_copy or not selected_amalgam_copy.carnival_original_amalgam then return end
+    -- Store the real amalgam so carnival_rip can read it (button callbacks don't receive custom config)
+    G.Carnival.ripping_amalgam = selected_amalgam_copy.carnival_original_amalgam
+
+    --Make a cardarea with all the jokers in the selected amalgam
+    G.Carnival.Ripping_menu = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
+        type = "joker",
+        highlight_limit = 1,
+        card_limit = 6
+    })
+    G.Carnival.Ripping_menu.config.card_limits.extra_slots_used = 0 --For some reason, this is not being set correctly, so we need to set it manually
+
+    for _, joker in pairs(G.GAME.invis_card_area.cards) do
+        for _, stored_key in pairs(selected_amalgam_copy.ability.extra.stored_joker_keys) do
+            if joker.config.center_key == stored_key then
+                local joker_copy = copy_card(joker)
+                joker_copy.cost = 0
+                joker_copy.sell_cost = 0
+                joker_copy.sell_cost_label = (joker_copy.facing == 'back' and "?") or 0
+                joker_copy.carnival_original_joker = joker
+                -- Spawn at 0,0 so copies don't inherit the invis area's off-screen position
+                joker_copy.T.x = 0
+                joker_copy.T.y = 0
+                joker_copy:hard_set_T()
+
+                G.Carnival.Ripping_menu:emplace(joker_copy)
+            end
+        end
+    end
+
+    G.FUNCS.exit_overlay_menu()
+
+    G.FUNCS.overlay_menu({
+        definition = create_UIBox_generic_options({
+            contents = {
+                {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
+                    {n = G.UIT.O, config = {object = G.Carnival.Ripping_menu}},
+                    {n = G.UIT.C, config = {button = "carnival_rip", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true}, nodes = {
+                        {n = G.UIT.T, config = {text = "Rip", align = "cm", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+                    }}
+                }}
+            }
+        })
+    })
+end
+
+-- To keep with the consistency of jokers not having any buttons, we need to create a consumable that allows the player to rip a joker out of an amalgam.
+-- Seal of Destruction consumable
+SMODS.Consumable {
+    key = "objl_seal_of_destruction",
+    set = "carnival_abilities",
+    loc_txt = {
+        name = "Seal of Destruction",
+        text = {
+            "Allows the player to rip a joker out of an {C:attention}amalgam{}.",
+            "An {C:attention}amalgam{} can only be ripped apart three times before it is destroyed.",
+            "The joker ripped out of an {C:attention}amalgam{} is returned to the player's hand.",
+        }
+    },
+    atlas = "atlas_temp_jokers",
+    pos = { x = 0, y = 0 },
+    can_use = function(self, card)
+        if next(SMODS.find_card("j_carnival_objl_amalgam")) then
+            return true
+        end
+    end,
+    use = function(self, card, area, copier)
+        -- First, open a menu that has all the player's amalgams in it
+        G.Carnival.Amalgam_menu = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
+            type = "joker",
+            highlight_limit = 1,
+            card_limit = #G.jokers.cards,
+        })
+        G.Carnival.Amalgam_menu.config.card_limits.extra_slots_used = 0 --For some reason, this is not being set correctly, so we need to set it manually
+        -- Get all amalgams and add them to the menu
+        for _, card in ipairs(G.jokers.cards) do
+            if card.config.center_key == "j_carnival_objl_amalgam" then
+                local copy = copy_card(card)
+                copy.cost = 0
+                copy.sell_cost = 0
+                copy.sell_cost_label = (copy.facing == 'back' and '?') or 0
+                copy.carnival_original_amalgam = card
+                G.Carnival.Amalgam_menu:emplace(copy)
+            end
+        end
+
+        -- Display the amalgam menu in an overlay menu
+        G.FUNCS.overlay_menu({
+            definition = create_UIBox_generic_options({
+                contents = {
+                    {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
+                        {n = G.UIT.O, config = {object = G.Carnival.Amalgam_menu}},
+                        {n = G.UIT.C, config = {button = "carnival_open_rip_menu", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true}, nodes = {
+                            {n = G.UIT.T, config = {text = "Select",align = "cm", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+                        }}
+                    }}
+                }
+            })
+        })
+    end,
+    keep_on_use = function(self, card)
+        return true
+    end,
+    eternal_compat = true,
+    add_to_deck = function(self, card)
+        card:set_eternal(true)
+        card:set_edition('e_negative', true, true)
+    end,
+}
+
+-- Return the visible amalgam in G.jokers that contains this invis joker (by center_key).
+local function get_amalgam_for_invis_joker(invis_card)
+    if not invis_card or not invis_card.config or not G.jokers or not G.jokers.cards then return nil end
+    local key = invis_card.config.center_key or (invis_card.config.center and invis_card.config.center.key)
+    if not key then return nil end
+    for _, card in ipairs(G.jokers.cards) do
+        if card and card.ability and card.ability.extra and card.ability.extra.stored_joker_keys then
+            for i = 1, #card.ability.extra.stored_joker_keys do
+                if card.ability.extra.stored_joker_keys[i] == key then
+                    return card
+                end
+            end
+        end
+    end
+    return nil
+end
+
+-- Redirect scoring messages from invis_card_area jokers to appear under their amalgam.
+do
+    local orig = card_eval_status_text
+    function card_eval_status_text(card, eval_type, amt, percent, dir, extra)
+        if card and G.GAME and G.GAME.invis_card_area and card.area == G.GAME.invis_card_area then
+            local amalgam = get_amalgam_for_invis_joker(card)
+            if amalgam then card = amalgam end
+        end
+        return orig(card, eval_type, amt, percent, dir, extra)
+    end
+end
+
+-- When a joker inside an amalgam triggers, shake the amalgam.
+if SMODS and SMODS.calculate_effect then
+    local orig_calc = SMODS.calculate_effect
+    SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
+        if effect and effect.juice_card and G.GAME and G.GAME.invis_card_area and effect.juice_card.area == G.GAME.invis_card_area then
+            local amalgam = get_amalgam_for_invis_joker(effect.juice_card)
+            if amalgam then effect.juice_card = amalgam end
+        end
+        return orig_calc(effect, scored_card, from_edition, pre_jokers)
+    end
+end

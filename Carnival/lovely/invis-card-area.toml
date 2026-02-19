@@ -1,0 +1,14 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Add G.GAME.invis_card_area to SMODS.get_card_areas('jokers') so OBJ_L amalgam jokers are evaluated
+[[patches]]
+[patches.pattern]
+target = '=[SMODS _ "src/utils.lua"]'
+pattern = '''-- TARGET: add your own CardAreas for joker evaluation'''
+position = "after"
+payload = '''
+if G.GAME.invis_card_area then t[#t+1] = G.GAME.invis_card_area end'''
+match_indent = true

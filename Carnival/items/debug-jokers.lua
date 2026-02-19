@@ -1,5 +1,5 @@
--- All of these jokers dump a different table into the console. 
-SMODS.Joker{
+-- All of these jokers dump a different table into the console.
+--[[SMODS.Joker{
     key = "G_DUMP",
     atlas = "atlas_temp_jokers",
     pos = {x = 0, y = 0},
@@ -10,7 +10,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G is currently ' .. inspect(G))        
+        sendInfoMessage('[Carnival] G is currently ' .. inspect(G))
     end
 }
 SMODS.Joker{
@@ -24,7 +24,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G.jokers is currently ' .. inspect(G.jokers))        
+        sendInfoMessage('[Carnival] G.jokers is currently ' .. inspect(G.jokers))
     end
 }
 --G.jokers.cards just stores the number of owned jokers. seemingly can't get anything else from this.
@@ -39,7 +39,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        sendInfoMessage('[Carnival] G.jokers.cards is currently ' .. inspect(G.jokers.cards))        
+        sendInfoMessage('[Carnival] G.jokers.cards is currently ' .. inspect(G.jokers.cards))
     end
 }
 
@@ -51,12 +51,11 @@ SMODS.Joker{
         name = "Feature Test Joker",
         text = {
             "Upon obtaining this joker... something will happon",
-            "something = Iterating through G.jokers.cards and printing the joker"
+            "something = sendDebugMessage(inspectdeapth(SMODS.find_card('j_cry_supercell')))"
         }
     },
     add_to_deck = function()
-        for index, joker in ipairs(G.jokers.cards) do
-            sendDebugMessage(inspect(joker))
-        end
+        sendDebugMessage(inspectDepth(SMODS.find_card('j_cry_supercell'),4,5))
     end
 }
+]]

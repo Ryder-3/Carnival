@@ -1,15 +1,16 @@
 --Quest pack
 --Pick one of the four quest jokers to get
-
+--TODO Make it so the weight scales based on the amount of owned quests
 SMODS.Booster {
     key = "quest_pack",
     loc_txt = {
         name = "Quest Pack",
         text = {
             "Choose {C:attention}#1#{} of the",
-            "{C:attention}#2#{} quest cards to add to your",
-            "joker slots."
+            "{C:attention}#2#{} Hungry Jokers",
+            "to add to your joker slots."
         },
+        group_name = "Pick 1",
     },
     --TODO: make an actual booster atlas and put this in it
     atlas = "atlas_temp_jokers",
@@ -69,6 +70,10 @@ SMODS.Booster {
 
             return create_card("Joker", G.pack_cards, nil, "carnival_quest", true, true, "j_carnival_clubs_quest")
 
+        else
+
+            return create_card("Joker", G.pack_cards, nil, nil, true, true, "j_joker")
         end
+
     end
 }
