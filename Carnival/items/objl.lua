@@ -59,7 +59,7 @@ SMODS.Joker{
         }
     },
     add_to_deck = function()
-        local joker = SMODS.find_zcard('j_carnival_feature_test')[1]
+        local joker = SMODS.find_card('j_carnival_feature_test')[1]
         sendDebugMessage(inspectDepth(joker,4,5))
     end
 }
@@ -338,15 +338,22 @@ local function fill_holes(table)
 end
 
 G.FUNCS.carnival_rip = function(e)
- 
+    -- Button callbacks don't receive custom config (e.amalgam is nil), so we use the amalgam stored when opening the rip menu
+    local selected_amalgam = G.Carnival and G.Carnival.ripping_amalgam
+    if not selected_amalgam then return end
+
     --We need to get the joker out of G.GAME.invis_card_area
     --We need to get a copy of the joker into G.jokers
     --We need to incrament amalgam.used_rips
     --We need to decrease amalgam.used_slots
     --We need amalgam.stored_joker_keys to have all the used slots on the left, and all the empty slots on the right
-    local selected_amalgam = e.amalgam.carnival_original_amalgam
     local selected_joker = G.Carnival.Ripping_menu.highlighted[1].carnival_original_joker
     local outer_joker = copy_card(selected_joker)
+
+    -- Spawn at 0,0 so the joker doesn't inherit the invis area's off-screen position
+    outer_joker.T.x = 0
+    outer_joker.T.y = 0
+    outer_joker:hard_set_T()
 
     --Put the outer joker into G.jokers
     G.jokers:emplace(outer_joker)
@@ -356,8 +363,8 @@ G.FUNCS.carnival_rip = function(e)
     SMODS.destroy_cards(selected_joker, true)
 
     --Remove the selected joker key from the amalgam's stored_joker_keys
-    for i = 1, selected_amalgam.ability.extra.used_slots do
-        if selected_amalgam.ability.extra.stored_joker_keys[i] == selected_joker.config.center_key then
+    for i = 1, 6 do
+        if selected_amalgam.ability and selected_amalgam.ability.extra and selected_amalgam.ability.extra.stored_joker_keys and selected_amalgam.ability.extra.stored_joker_keys[i] == selected_joker.config.center_key then
             selected_amalgam.ability.extra.stored_joker_keys[i] = nil
             selected_amalgam.ability.extra.used_slots = selected_amalgam.ability.extra.used_slots - 1
             selected_amalgam.ability.extra.current_slot = selected_amalgam.ability.extra.current_slot - 1
@@ -369,12 +376,18 @@ G.FUNCS.carnival_rip = function(e)
             break
         end
     end
+    G.Carnival.ripping_amalgam = nil
     G.FUNCS.exit_overlay_menu()
 end
 
 -- This function holds the creation of the ripping menu
 G.FUNCS.carnival_open_rip_menu = function(e)
-    
+    G.Carnival = G.Carnival or {}
+    local selected_amalgam_copy = G.Carnival.Amalgam_menu and G.Carnival.Amalgam_menu.highlighted[1]
+    if not selected_amalgam_copy or not selected_amalgam_copy.carnival_original_amalgam then return end
+    -- Store the real amalgam so carnival_rip can read it (button callbacks don't receive custom config)
+    G.Carnival.ripping_amalgam = selected_amalgam_copy.carnival_original_amalgam
+
     --Make a cardarea with all the jokers in the selected amalgam
     G.Carnival.Ripping_menu = CardArea(0, 0, G.jokers.T.w, G.jokers.T.h, {
         type = "joker",
@@ -383,15 +396,18 @@ G.FUNCS.carnival_open_rip_menu = function(e)
     })
     G.Carnival.Ripping_menu.config.card_limits.extra_slots_used = 0 --For some reason, this is not being set correctly, so we need to set it manually
 
-    local selected_amalgam = G.Carnival.Amalgam_menu.highlighted[1] --Only 1 joker can be highlighted, so this will always be 1
     for _, joker in pairs(G.GAME.invis_card_area.cards) do
-        for _, stored_key in pairs(selected_amalgam.ability.extra.stored_joker_keys) do
+        for _, stored_key in pairs(selected_amalgam_copy.ability.extra.stored_joker_keys) do
             if joker.config.center_key == stored_key then
                 local joker_copy = copy_card(joker)
                 joker_copy.cost = 0
                 joker_copy.sell_cost = 0
                 joker_copy.sell_cost_label = (joker_copy.facing == 'back' and "?") or 0
                 joker_copy.carnival_original_joker = joker
+                -- Spawn at 0,0 so copies don't inherit the invis area's off-screen position
+                joker_copy.T.x = 0
+                joker_copy.T.y = 0
+                joker_copy:hard_set_T()
 
                 G.Carnival.Ripping_menu:emplace(joker_copy)
             end
@@ -405,8 +421,8 @@ G.FUNCS.carnival_open_rip_menu = function(e)
             contents = {
                 {n = G.UIT.C, config = {align = "cm", padding = 0.2, r = 0.2, colour = G.C.L_BLACK, emboss = 0.05, minw = 8.2}, nodes = {
                     {n = G.UIT.O, config = {object = G.Carnival.Ripping_menu}},
-                    {n = G.UIT.C, config = {button = "carnival_rip", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true, amalgam = selected_amalgam}, nodes = {
-                        {n = G.UIT.T, config = {text = "Rip", align = "cm", scale = 0.5, colour = G.C.UI.TRANSPARENT_LIGHT, shadow = true}}
+                    {n = G.UIT.C, config = {button = "carnival_rip", align = "cm", padding = 0.2, colour = G.C.PURPLE, r = 0.1, shadow = true}, nodes = {
+                        {n = G.UIT.T, config = {text = "Rip", align = "cm", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
                     }}
                 }}
             }
@@ -504,5 +520,17 @@ do
             if amalgam then card = amalgam end
         end
         return orig(card, eval_type, amt, percent, dir, extra)
+    end
+end
+
+-- When a joker inside an amalgam triggers, shake the amalgam.
+if SMODS and SMODS.calculate_effect then
+    local orig_calc = SMODS.calculate_effect
+    SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
+        if effect and effect.juice_card and G.GAME and G.GAME.invis_card_area and effect.juice_card.area == G.GAME.invis_card_area then
+            local amalgam = get_amalgam_for_invis_joker(effect.juice_card)
+            if amalgam then effect.juice_card = amalgam end
+        end
+        return orig_calc(effect, scored_card, from_edition, pre_jokers)
     end
 end
