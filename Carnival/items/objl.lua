@@ -32,36 +32,14 @@ local ensure_invis_card_area = function()
     G.GAME.invis_card_area = area
 end
 
--- Function to safely run a joker's calculate function.
-local safe_calculate = function(joker, context)
-    if not joker then return nil, false end
-    local effects, triggered
-    if type(joker.calculate_joker) == "function" then
-        effects, triggered = joker:calculate_joker(context)
-    end
-    -- If Card:calculate_joker returned nothing, try the definition's calculate directly
-    -- (e.g. card.area not in joker areas, or other Card-level checks prevented a return)
-    if (not effects and not triggered) and joker.config and joker.config.center then
-        local obj = joker.config.center
-        if obj.calculate and type(obj.calculate) == "function" and (not joker.ability or joker.ability.set ~= "Enhanced") then
-            effects, triggered = obj:calculate(joker, context)
-        end
-    end
-    sendDebugMessage("[Carnival] joker " .. (joker.config and joker.config.center_key or "?") .. " effects: " .. inspectDepth(effects, 4, 5)) --Test code
-    sendDebugMessage("[Carnival] joker " .. (joker.config and joker.config.center_key or "?") .. " triggered: " .. tostring(triggered)) --Test code
-    return effects, triggered
-end
-
 if not G.FUNCS then G.FUNCS = {} end
 -- Helper function to search invisable card area made by amalgams, like SMODS.find_card() but for the invisable card area
 G.FUNCS.search_invis_area = function (key)
     if not G.GAME.invis_card_area or not G.GAME.invis_card_area.cards then return end
     local results = {}
-    if G.GAME.invis_card_area.cards then
-        for _, card in pairs(G.GAME.invis_card_area.cards) do
-            if card and type(card) == 'table' and card.config.center.key == key then
-                table.insert(results, card)
-            end
+    for _, card in pairs(G.GAME.invis_card_area.cards) do
+        if card and type(card) == 'table' and card.config and (card.config.center_key == key or (card.config.center and card.config.center.key == key)) then
+            table.insert(results, card)
         end
     end
     return results
@@ -163,57 +141,6 @@ SMODS.Joker {
                 card.ability.extra.current_slot,
             }
         }
-    end,
-    -- The game expects a calculate function to return a table that looks like this:
-    -- {
-    --     "chips" = 1,
-    --     "mult" = 1,
-    --     "x_chips" = 1,
-    --     "x_mult" = 1,
-    --     "xchips" = 1,
-    --     "xmult" = 1,
-    --     "Xchip_mod" = 1,
-    --     "Xmult_mod" = 1,
-    --     "Xchip_mod" = 1,
-    -- }
-    -- To get that, we run the calculate of all the jokers in the amalgam, and add any values that share the same key to the effects table
-    calculate = function(self, card, context)
-        local effects = {}
-        local triggered = false
-        for i = 1, card.ability.extra.used_slots do
-            local key = card.ability.extra.stored_joker_keys[i]
-            if not key then goto continue end
-            local found = G.FUNCS.search_invis_area(key)
-            local joker = found and found[1]
-            if joker then
-                local joker_effects, joker_triggered = safe_calculate(joker, context)
-                if joker_triggered then
-                    triggered = true
-                end
-                if joker_effects then
-                    for mod, value in pairs(joker_effects) do
-                        if type(value) == 'number' then
-                            effects[mod] = (effects[mod] or 0) + value
-                            sendDebugMessage("[Carnival] added " .. value .. " to " .. mod .. " for amalgam " .. card.config.center_key) --Test code
-                        else
-                            -- Do not copy 'extra', it causes a LOT of retriggers whenever anything happens
-                            if mod ~= 'extra' then
-                                effects[mod] = value
-                                sendDebugMessage("[Carnival] added " .. value .. " to " .. mod .. " for amalgam " .. card.config.center_key) --Test code
-                            end
-                        end
-                    end
-                end
-            end
-            ::continue::
-        end
-        -- Effect tables must have repetitions; no extra chain or the game will retrigger in a loop
-        if triggered then
-            effects.repetitions = 1
-            effects.extra = nil
-            sendDebugMessage("[Carnival] amalgam " .. card.config.center_key .. " effects: " .. inspectDepth(effects, 4, 5)) --Test code
-            return effects
-        end
     end,
 }
 
