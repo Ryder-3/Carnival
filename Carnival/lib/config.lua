@@ -6,6 +6,7 @@ function Game:start_run(args)
     if not G.GAME.Carnival then
         G.GAME.Carnival = {}
     end
+    
 
 
     --Make the table for the Minor Arcana values

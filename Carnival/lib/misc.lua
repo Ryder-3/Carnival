@@ -6,3 +6,4 @@ SMODS.ConsumableType{
     loc_txt = { collection = "Abilities", name = "Abilities" },
     collection_rows = { 4, 4 },
 }
+
