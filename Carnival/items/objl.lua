@@ -14,6 +14,8 @@
 local ensure_invis_card_area = function()
     if G.GAME.invis_card_area then return end
     local area = CardArea(
+
+        -- Way off screen
         G.ROOM.T.x + 100000,
         G.ROOM.T.y + 100000,
         0, 0,
@@ -44,26 +46,6 @@ G.FUNCS.search_invis_area = function (key)
     end
     return results
 end
-
-
--- TEST
-SMODS.Joker{
-    key = "feature_test",
-    atlas = "atlas_temp_jokers",
-    pos = {x = 0, y = 0},
-    loc_txt = {
-        name = "Feature Test Joker",
-        text = {
-            "Upon obtaining this joker... something will happon",
-            "something = sendDebugMessage(inspectdeapth(this joker)))"
-        }
-    },
-    add_to_deck = function()
-        local joker = SMODS.find_card('j_carnival_feature_test')[1]
-        sendDebugMessage(inspectDepth(joker,4,5))
-    end
-}
-
 
 --OBJ_L joker
 SMODS.Joker {
@@ -102,22 +84,21 @@ SMODS.Joker {
     loc_txt = {
         name = "Amalgam",
         text = {
-            "An amalgam of jokers.",
-            "Can hold up to #2# jokers.",
-            "Currently #1#/#2# slots used.",
+            "An amalgam of {C:attention}jokers{}.",
+            "Can hold up to {C:attention}#2#{} jokers.",
+            "Currently {C:attention}#1#{}/{C:attention}#2#{} slots used.",
             "",
-            "You can rip up to #4# jokers out of this amalgam.",
-            "Currently #3#/#4# rips used.",
+            "You can rip up to {C:attention}#4#{} jokers out of this amalgam.",
+            "Currently {C:attention}#3#{}/{C:attention}#4#{} rips used.",
             
         }
     },
     -- TODO: I can see bad things happening if there are duplicate jokers in the invis_card_area
     -- TODO: Make the art of the Amalgam update to show the jokers inside of it
     -- TODO: Make the values of the interted jokers double for each joker in the amalgam
-    -- TODO: Track the number of times an amalgam has been ripped apart
     config = {
         extra = {
-            stored_joker_keys = {nil, nil, nil, nil, nil, nil},
+            stored_joker_keys = {},
             current_slot = 1,
             used_slots = 0,
             available_slots = 6,
@@ -163,7 +144,6 @@ SMODS.Joker {
         }
     end,
 }
-
 
 -- Function to merge the selected jokers into an amalgam
 G.FUNCS.carnival_merge_jokers = function(e)
