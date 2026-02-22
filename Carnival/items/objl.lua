@@ -36,7 +36,7 @@ end
 
 if not G.FUNCS then G.FUNCS = {} end
 -- Helper function to search invisable card area made by amalgams, like SMODS.find_card() but for the invisable card area
-G.FUNCS.search_invis_area = function (key)
+G.FUNCS.carnival_search_invis_area = function (key)
     if not G.GAME.invis_card_area or not G.GAME.invis_card_area.cards then return end
     local results = {}
     for _, card in pairs(G.GAME.invis_card_area.cards) do
@@ -52,6 +52,7 @@ SMODS.Joker {
     key = "objl",
     atlas = "atlas_temp_jokers",
     pos = { x = 0, y = 0 },
+    rarity = "carnival_ringleader",
     loc_txt = {
         name = "OBJ_L: Creation Incarnate",
         text = {
@@ -60,7 +61,7 @@ SMODS.Joker {
         }
     },
 
-    add_to_deck = function(self, card)
+    add_to_deck = function(self, card) 
         SMODS.add_card({key = "c_carnival_objl_seal_of_creation", G.consumeables})
         SMODS.add_card({key = "c_carnival_objl_seal_of_destruction", G.consumeables})
         ensure_invis_card_area()
@@ -81,6 +82,7 @@ SMODS.Joker {
     atlas = "atlas_temp_jokers",
     pos = { x = 0, y = 0 },
     no_collection = true,
+    rarity = "carnival_creation",
     loc_txt = {
         name = "Amalgam",
         text = {
@@ -108,14 +110,12 @@ SMODS.Joker {
         },
     },
     remove_from_deck = function(self, card, from_debuff)
-        sendDebugMessage("[Carnival] removing amalgam from deck")
         for i = 1, #card.ability.extra.stored_joker_keys do
             if card.ability.extra.stored_joker_keys[i] then
-                local found = G.FUNCS.search_invis_area(card.ability.extra.stored_joker_keys[i])
+                local found = G.FUNCS.carnival_search_invis_area(card.ability.extra.stored_joker_keys[i])
                 local joker = found and found[1]
                 if joker then
                     SMODS.destroy_cards(joker, true)
-                    sendDebugMessage("[Carnival] joker " .. joker.config.center_key .. " destroyed")
                 end
             end
         end
@@ -125,7 +125,7 @@ SMODS.Joker {
 
         -- This displays tooltips on the side of the amalgam that show the jokers inside of it
         for i = 1, card.ability.extra.used_slots do
-            local found = G.FUNCS.search_invis_area(card.ability.extra.stored_joker_keys[i])
+            local found = G.FUNCS.carnival_search_invis_area(card.ability.extra.stored_joker_keys[i])
             local joker = found and found[1]
             if joker and joker.config and joker.config.center_key then
                 info_queue[#info_queue+1] = G.P_CENTERS[joker.config.center_key]

@@ -12,14 +12,20 @@ SMODS.ConsumableType {
 
 
 -- Hooking into the functions that determine the scores of playing cards to add their level bonus
+-- (Rank leveling + Spades chips; get_chip_mult is hooked again below for Clubs)
 do
     local gcb = Card.get_chip_bonus
     function Card:get_chip_bonus()
         local ret = gcb(self)
-        -- Makes sure that self is a playing card with a rank
-        if ret and self.base and self.base.value then
-            local level_bonus = (G.GAME.Carnival.Rank_leveling_values[self.base.value].chip_mod * G.GAME.Carnival.current_rank_levels[self.base.value]) or 0
+        if not ret then return ret end
+        -- Rank leveling
+        if self.base and self.base.value and G.GAME and G.GAME.Carnival and G.GAME.Carnival.Rank_leveling_values then
+            local level_bonus = (G.GAME.Carnival.Rank_leveling_values[self.base.value].chip_mod * (G.GAME.Carnival.current_rank_levels[self.base.value] or 0)) or 0
             ret = ret + level_bonus
+        end
+        -- Spades: +5 chips per Spade level
+        if self.base and self.base.suit == "Spades" and G.GAME and G.GAME.Carnival and G.GAME.Carnival.current_suit_levels then
+            ret = ret + 5 * (G.GAME.Carnival.current_suit_levels["Spades"] or 0)
         end
         return ret
     end
@@ -27,14 +33,18 @@ do
     local gcm = Card.get_chip_mult
     function Card:get_chip_mult()
         local ret = gcm(self)
-        -- Makes sure that self is a playing card with a rank
-        if ret and self.base and self.base.value then
-            local level_bonus = (G.GAME.Carnival.Rank_leveling_values[self.base.value].mult_mod * G.GAME.Carnival.current_rank_levels[self.base.value]) or 0
+        if not ret then return ret end
+        -- Rank leveling
+        if self.base and self.base.value and G.GAME and G.GAME.Carnival and G.GAME.Carnival.Rank_leveling_values then
+            local level_bonus = (G.GAME.Carnival.Rank_leveling_values[self.base.value].mult_mod * (G.GAME.Carnival.current_rank_levels[self.base.value] or 0)) or 0
             ret = ret + level_bonus
+        end
+        -- Clubs: +0.7 mult per Club level
+        if self.base and self.base.suit == "Clubs" and G.GAME and G.GAME.Carnival and G.GAME.Carnival.current_suit_levels then
+            ret = ret + 0.7 * (G.GAME.Carnival.current_suit_levels["Clubs"] or 0)
         end
         return ret
     end
-
 end
 
 
@@ -93,34 +103,7 @@ do
     end
 end
 
---For each spade level, all spades give + 5 chips
-do
-    local gch = Card.get_chip_bonus
-    function Card:get_chip_bonus()
-        local ret = gch(self)
-        local is_spade = self.base and self.base.suit == "Spades"
-        if is_spade then
-            ret = ret + 5 * G.GAME.Carnival.current_suit_levels["Spades"]
-        end
-        return ret
-    end
-end
-
---For each club level, all clubs give + 0.7 mult
-do
-    local gcm = Card.get_chip_mult
-    function Card:get_chip_mult()
-        local ret = gcm(self)
-        local is_club = self.base and self.base.suit == "Clubs"
-        if is_club then
-            ret = ret + 0.7 * G.GAME.Carnival.current_suit_levels["Clubs"]
-        end
-        return ret
-    end
-end
-
-
--- I should be able to create all the minor arcana with a for loop
+-- Creates all the minor arcana cards
 local suits = {{"Wands", "Hearts"}, {"Cups", "Spades"}, {"Pentacles", "Diamonds"}, {"Swords", "Clubs"}}
 local rank_for_name = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Knight", "Queen", "King"}
 local rank_for_key = {"Ace", '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King'}
@@ -159,6 +142,7 @@ for _, suit_pair in ipairs(suits) do
                 },
             }
         end,
+        cost = 4,
         can_use = function(self, card)
             return true
         end,
@@ -204,7 +188,10 @@ do
             else
                 msg = level .. "/20 chance for X " .. mult .. " Mult and a guaranteed X " .. sure_mult .. " Mult"
             end
-            local text_node = { n = G.UIT.T, config = { text = msg, scale = 0.35, colour = G.C.MULT } }
+            -- This was causing crashes, so I'm just setting it manually
+            local col = (G.C.MULT and copy_table(G.C.MULT)) or { 1, 0.5, 0.2, 1 }
+            if not col[4] then col[4] = 1 end
+            local text_node = { n = G.UIT.T, config = { text = msg, scale = 0.35, colour = col } }
             desc_nodes[#desc_nodes + 1] = { text_node }
         end
         return lpb(specific_vars, desc_nodes)
