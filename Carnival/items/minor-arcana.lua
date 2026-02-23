@@ -107,7 +107,7 @@ end
 local suits = {{"Wands", "Hearts"}, {"Cups", "Spades"}, {"Pentacles", "Diamonds"}, {"Swords", "Clubs"}}
 local rank_for_name = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Knight", "Queen", "King"}
 local rank_for_key = {"Ace", '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King'}
-Ensure_minor_arcana_tables()
+
 for _, suit_pair in ipairs(suits) do
     for rank_index, rank_name in ipairs(rank_for_name) do
         SMODS.Consumable {
@@ -128,6 +128,7 @@ for _, suit_pair in ipairs(suits) do
             },
         },
         loc_vars = function(self, info_queue, card)
+            Ensure_minor_arcana_tables()
             local extra = (card and card.ability.extra) or self.config.extra
             local suit = extra.suit
             local rank = extra.rank
