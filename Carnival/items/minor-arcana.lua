@@ -173,8 +173,6 @@ for _, suit_pair in ipairs(suits) do
     end
 end
 
-
--- Hook SMODS.localize_perma_bonuses to show Hearts chance line (raw UI node, no localization)
 do
     local lpb = SMODS.localize_perma_bonuses
     ---@diagnostic disable-next-line: duplicate-set-field

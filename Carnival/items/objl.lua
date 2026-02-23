@@ -139,8 +139,8 @@ SMODS.Joker {
         for i = 1, card.ability.extra.used_slots do
             local found = G.FUNCS.carnival_search_invis_area(card.ability.extra.stored_joker_keys[i])
             local joker = found and found[1]
-            if joker and joker.config and joker.config.center_key then
-                info_queue[#info_queue+1] = G.P_CENTERS[joker.config.center_key]
+            if joker then
+                info_queue[#info_queue+1] = joker
             end
         end
 
@@ -349,15 +349,9 @@ local function fill_holes(table)
 end
 
 G.FUNCS.carnival_rip = function(e)
-    -- Button callbacks don't receive custom config (e.amalgam is nil), so we use the amalgam stored when opening the rip menu
     local selected_amalgam = G.Carnival and G.Carnival.ripping_amalgam
     if not selected_amalgam then return end
 
-    --We need to get the joker out of G.GAME.invis_card_area
-    --We need to get a copy of the joker into G.jokers
-    --We need to incrament amalgam.used_rips
-    --We need to decrease amalgam.used_slots
-    --We need amalgam.stored_joker_keys to have all the used slots on the left, and all the empty slots on the right
     local selected_joker = G.Carnival.Ripping_menu.highlighted[1].carnival_original_joker
     local outer_joker = copy_card(selected_joker)
 
@@ -505,18 +499,19 @@ SMODS.Consumable {
     end,
 }
 
--- Return the visible amalgam in G.jokers that contains this invis joker (by center_key).
+-- Return the visible amalgam in G.jokers that contains this invis joker (by identity_key).
 local function get_amalgam_for_invis_joker(invis_card)
     if not invis_card or not invis_card.config or not G.jokers or not G.jokers.cards then return nil end
-    local key = invis_card.config.center_key or (invis_card.config.center and invis_card.config.center.key)
-    if not key then return nil end
+    local card_key = invis_card.ability.extra.parent_amalgam_key
+    if not card_key then return nil end
     for _, card in ipairs(G.jokers.cards) do
-        if card and card.ability and card.ability.extra and card.ability.extra.stored_joker_keys then
+        if (card.ability.extra and card.ability.extra.indentity_key) and card.ability.extra.indentity_key == card_key then
             for i = 1, #card.ability.extra.stored_joker_keys do
                 if card.ability.extra.stored_joker_keys[i] == key then
                     return card
                 end
             end
+        
         end
     end
     return nil
