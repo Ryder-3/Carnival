@@ -15,6 +15,7 @@ SMODS.ConsumableType {
 -- (Rank leveling + Spades chips; get_chip_mult is hooked again below for Clubs)
 do
     local gcb = Card.get_chip_bonus
+    ---@diagnostic disable-next-line: duplicate-set-field
     function Card:get_chip_bonus()
         local ret = gcb(self)
         if not ret then return ret end
@@ -31,6 +32,7 @@ do
     end
 
     local gcm = Card.get_chip_mult
+    ---@diagnostic disable-next-line: duplicate-set-field
     function Card:get_chip_mult()
         local ret = gcm(self)
         if not ret then return ret end
@@ -52,6 +54,7 @@ end
 -- For each heart level, all hearts have a [heart_level] in 20 chance to give *1.5 mult
 do
     local gcxm = Card.get_chip_x_mult
+    ---@diagnostic disable-next-line: duplicate-set-field
     function Card:get_chip_x_mult()
         local ret = gcxm(self)
         local is_heart = self.base and self.base.suit == "Hearts"
@@ -88,6 +91,7 @@ end
 -- For each diamond level, all diamonds give 0.1 money
 do
     local gpd = Card.get_p_dollars
+    ---@diagnostic disable-next-line: duplicate-set-field
     function Card:get_p_dollars()
         local ret = gpd(self)
         local is_diamond = self.base and self.base.suit == "Diamonds"
@@ -172,6 +176,7 @@ end
 -- Hook SMODS.localize_perma_bonuses to show Hearts chance line (raw UI node, no localization)
 do
     local lpb = SMODS.localize_perma_bonuses
+    ---@diagnostic disable-next-line: duplicate-set-field
     function SMODS.localize_perma_bonuses(specific_vars, desc_nodes)
         if specific_vars and specific_vars.carnival_hearts_x and desc_nodes then
             local h = specific_vars.carnival_hearts_x

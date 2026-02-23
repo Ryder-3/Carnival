@@ -218,7 +218,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_diamonds = 0,
-            goal = 5, -- for testing
+            goal = 100, 
     },
     rarity = "carnival_quest",
     pools = {carnival_quest = true},

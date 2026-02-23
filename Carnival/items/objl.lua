@@ -1,3 +1,4 @@
+math.randomseed(os.time())
 -- Joker: OBJ_L: Creation Incarnate
 -- Idea: Ryder
 -- Coder: Ryder
@@ -109,6 +110,17 @@ SMODS.Joker {
 
         },
     },
+    
+    add_to_deck = function(self, card)
+        -- To handle the case where there are duplicate jokers in the invis_card_area, all amalgams have a unique key, and jokers in that amalgam have a new parameter that stores its parent amalgam's key
+        ::reset_key::
+        card.ability.extra.identity_key = math.random(1, 1000000)
+        for _, joker in pairs(G.jokers.cards) do
+            if joker.ability.extra and joker.ability.extra.identity_key and joker.ability.extra.identity_key == card.ability.extra.identity_key then
+                goto reset_key
+            end
+        end
+    end,
     remove_from_deck = function(self, card, from_debuff)
         for i = 1, #card.ability.extra.stored_joker_keys do
             if card.ability.extra.stored_joker_keys[i] then
@@ -177,6 +189,11 @@ G.FUNCS.carnival_merge_jokers = function(e)
 
                         -- Store the joker_2 in the invisable card area
                         local joker_2_copy = copy_card(joker_2)
+
+                        joker_2_copy.ability = joker_2.ability or {}
+                        joker_2_copy.ability.extra = joker_2.ability.extra or {}
+                        joker_2_copy.ability.extra.parent_amalgam_key = joker_1.ability.extra.identity_key
+
                         G.GAME.invis_card_area:emplace(joker_2_copy)
 
                         SMODS.destroy_cards(joker_2, true)
@@ -192,6 +209,12 @@ G.FUNCS.carnival_merge_jokers = function(e)
 
                         -- Store the joker_1 in the invisable card area
                         local joker_1_copy = copy_card(joker_1)
+
+
+                        joker_1_copy.ability = joker_1.ability or {}
+                        joker_1_copy.ability.extra = joker_1.ability.extra or {}
+                        joker_1_copy.ability.extra.parent_amalgam_key = joker_2.ability.extra.identity_key
+
                         G.GAME.invis_card_area:emplace(joker_1_copy)
 
                         SMODS.destroy_cards(joker_1, true)
@@ -202,7 +225,15 @@ G.FUNCS.carnival_merge_jokers = function(e)
                         -- This looks really bad, but all it does is take both jokers and store their centers in the amalgams 'stored_jokers' table,
                         -- then updates which slot is the next empty slot.
 
-                        --New idea, for each joker, we store their .ability table, then make a new joker with the new .ability table in the amalgam's own, invisable, card area
+                        amalgam:add_to_deck()
+
+                        joker_1.ability = joker_1.ability or {}
+                        joker_1.ability.extra = joker_1.ability.extra or {}
+                        joker_1.ability.extra.parent_amalgam_key = amalgam.ability.extra.identity_key
+
+                        joker_2.ability = joker_2.ability or {}
+                        joker_2.ability.extra = joker_2.ability.extra or {}
+                        joker_2.ability.extra.parent_amalgam_key = amalgam.ability.extra.identity_key
 
                         
                         amalgam.ability.extra.stored_joker_keys[amalgam.ability.extra.current_slot] = joker_1.config.center_key
@@ -214,7 +245,7 @@ G.FUNCS.carnival_merge_jokers = function(e)
                         amalgam.ability.extra.used_slots = amalgam.ability.extra.used_slots + 1
 
                         G.jokers:emplace(amalgam)
-                        amalgam:add_to_deck()
+                        
 
                         local joker_1_copy = copy_card(joker_1)
                         local joker_2_copy = copy_card(joker_2)
@@ -350,7 +381,7 @@ G.FUNCS.carnival_rip = function(e)
             selected_amalgam.ability.extra.current_slot = selected_amalgam.ability.extra.current_slot - 1
             selected_amalgam.ability.extra.stored_joker_keys = fill_holes(selected_amalgam.ability.extra.stored_joker_keys)
             selected_amalgam.ability.extra.used_rips = selected_amalgam.ability.extra.used_rips + 1
-            if selected_amalgam.ability.extra.used_rips == selected_amalgam.ability.extra.available_rips then
+            if selected_amalgam.ability.extra.used_rips == selected_amalgam.ability.extra.available_rips or selected_amalgam.ability.extra.used_slots == 0 then
                 SMODS.destroy_cards(selected_amalgam, true)
             end
             break
@@ -494,6 +525,7 @@ end
 -- Redirect scoring messages from invis_card_area jokers to appear under their amalgam.
 do
     local orig = card_eval_status_text
+    ---@diagnostic disable-next-line: lowercase-global
     function card_eval_status_text(card, eval_type, amt, percent, dir, extra)
         if card and G.GAME and G.GAME.invis_card_area and card.area == G.GAME.invis_card_area then
             local amalgam = get_amalgam_for_invis_joker(card)
@@ -506,11 +538,36 @@ end
 -- When a joker inside an amalgam triggers, shake the amalgam.
 if SMODS and SMODS.calculate_effect then
     local orig_calc = SMODS.calculate_effect
+    ---@diagnostic disable-next-line: duplicate-set-field
     SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
         if effect and effect.juice_card and G.GAME and G.GAME.invis_card_area and effect.juice_card.area == G.GAME.invis_card_area then
             local amalgam = get_amalgam_for_invis_joker(effect.juice_card)
             if amalgam then effect.juice_card = amalgam end
         end
         return orig_calc(effect, scored_card, from_edition, pre_jokers)
+    end
+end
+
+-- Make jokers in invis_card_area see context.cardarea == G.jokers so their passive/before/after
+-- effects trigger (many jokers check context.cardarea == G.jokers and skip otherwise).
+if SMODS and SMODS.calculate_card_areas then
+    local orig_calc_card_areas = SMODS.calculate_card_areas
+    ---@diagnostic disable-next-line: duplicate-set-field
+    SMODS.calculate_card_areas = function(_type, context, return_table, args)
+        if _type ~= 'jokers' or not context or not G.GAME or not G.GAME.invis_card_area then
+            return orig_calc_card_areas(_type, context, return_table, args)
+        end
+        local real = context
+        local proxy = setmetatable({}, {
+            __index = real,
+            __newindex = function(_, k, v)
+                if k == 'cardarea' and v == G.GAME.invis_card_area then
+                    real[k] = G.jokers
+                else
+                    real[k] = v
+                end
+            end
+        })
+        return orig_calc_card_areas(_type, proxy, return_table, args)
     end
 end

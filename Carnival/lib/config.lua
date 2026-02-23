@@ -1,4 +1,5 @@
 local start_run_ref = Game.start_run
+---@diagnostic disable-next-line: duplicate-set-field
 function Game:start_run(args)
     start_run_ref(self, args)
 
