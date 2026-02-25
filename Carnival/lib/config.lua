@@ -1,4 +1,5 @@
 local start_run_ref = Game.start_run
+-- Hooks into the function that runs when the run starts, making sure all the tables that store values for Carnival are made
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:start_run(args)
     start_run_ref(self, args)
@@ -57,7 +58,9 @@ function Game:start_run(args)
     end
 end
 
--- Makes sure that the minor arcana tables are initialized
+
+--Ensures that all the Tables needed for making the Minor Arcana exist, even if Game:start_run hasn't been called yet.\
+--This allows the local vars of the minor arcana to exist when they are viewed in the collection.
 function Ensure_minor_arcana_tables()
     if not G.GAME then
         G.GAME = {}
