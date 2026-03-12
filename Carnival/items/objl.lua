@@ -51,8 +51,8 @@ end
 --OBJ_L joker
 SMODS.Joker {
     key = "objl",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 4, y = 0 },
     rarity = "carnival_ringleader",
     loc_txt = {
         name = "OBJ_L: Creation Incarnate",
