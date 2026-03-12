@@ -126,8 +126,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "spades_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 1, y = 0 },
     loc_txt = {
         name = "Spades Slobberer",
         text = {
@@ -202,8 +202,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "diamonds_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 3, y = 0 },
     loc_txt = {
         name = "Diamonds Devourer",
         text = {
@@ -279,8 +279,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "clubs_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 2, y = 0 },
     loc_txt = {
         name = "Clubs Consumer",
         text = {
