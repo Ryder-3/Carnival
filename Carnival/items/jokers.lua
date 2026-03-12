@@ -77,7 +77,6 @@ SMODS.Joker{
             }
         }
     end,
-    --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
         --The logic for making progress on the joker.

@@ -1,2 +1,3 @@
 # Carnival
-A Crypted Addon that focuses on making the game even more unbalenced
+A Crypted Addon (for now) that focuses on adding more progression and little mini games into Balatro
+
