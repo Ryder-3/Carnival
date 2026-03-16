@@ -77,7 +77,6 @@ SMODS.Joker{
             }
         }
     end,
-    --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
         --The logic for making progress on the joker.
@@ -106,11 +105,13 @@ SMODS.Joker{
             if card.ability.goal < card.ability.played_hearts then
                 for _, played_card in ipairs(context.scoring_hand) do
                     if played_card:is_suit('Hearts') then
+                        local col = copy_table(G.C.DARK_EDITION or {0.2, 0.2, 0.35, 1})
+                        if not col[4] then col[4] = 1 end
                         return {
                             message = {"^1.5 Chips and Mult!"},
                             Echip_mod = lenient_bignum(card.ability.Echips),
                             Emult_mod = lenient_bignum(card.ability.Emult),
-				            colour = G.C.DARK_EDITION,
+				            colour = col,
                         }
                     end
                 end
@@ -125,8 +126,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "spades_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 1, y = 0 },
     loc_txt = {
         name = "Spades Slobberer",
         text = {
@@ -153,7 +154,6 @@ SMODS.Joker{
             }
         }
     end,
-    --TODO sound effects for this should feel more powerful than the normal joker sound
     calculate = function(self, card, context)
 
         --The logic for making progress on the joker.
@@ -182,11 +182,13 @@ SMODS.Joker{
             if card.ability.goal < card.ability.played_spades then
                 for _, played_card in ipairs(context.scoring_hand) do
                     if played_card:is_suit('Spades') then
+                        local col = copy_table(G.C.DARK_EDITION or {0.2, 0.2, 0.35, 1})
+                        if not col[4] then col[4] = 1 end
                         return {
                             message = {"^1.5 Chips and Mult!"},
                             Echip_mod = lenient_bignum(card.ability.Echips),
                             Emult_mod = lenient_bignum(card.ability.Emult),
-				            colour = G.C.DARK_EDITION,
+				            colour = col,
                         }
                     end
                 end
@@ -200,8 +202,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "diamonds_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 3, y = 0 },
     loc_txt = {
         name = "Diamonds Devourer",
         text = {
@@ -214,7 +216,7 @@ SMODS.Joker{
             Emult = 1.5,
             Echips = 1.5,
             played_diamonds = 0,
-            goal = 100,
+            goal = 100, 
     },
     rarity = "carnival_quest",
     pools = {carnival_quest = true},
@@ -257,11 +259,13 @@ SMODS.Joker{
             if card.ability.goal < card.ability.played_diamonds then
                 for _, played_card in ipairs(context.scoring_hand) do
                     if played_card:is_suit('Diamonds') then
+                        local col = copy_table(G.C.DARK_EDITION or {0.2, 0.2, 0.35, 1})
+                        if not col[4] then col[4] = 1 end
                         return {
                             message = {"^1.5 Chips and Mult!"},
                             Echip_mod = lenient_bignum(card.ability.Echips),
                             Emult_mod = lenient_bignum(card.ability.Emult),
-				            colour = G.C.DARK_EDITION,
+				            colour = col,
                         }
                     end
                 end
@@ -275,8 +279,8 @@ SMODS.Joker{
 -- Name: OBJ_Lily
 SMODS.Joker{
     key = "clubs_quest",
-    atlas = "atlas_temp_jokers",
-    pos = { x = 0, y = 0 },
+    atlas = "atlas_jokers",
+    pos = { x = 2, y = 0 },
     loc_txt = {
         name = "Clubs Consumer",
         text = {
@@ -332,11 +336,13 @@ SMODS.Joker{
             if card.ability.goal < card.ability.played_clubs then
                 for _, played_card in ipairs(context.scoring_hand) do
                     if played_card:is_suit('Clubs') then
+                        local col = copy_table(G.C.DARK_EDITION or {0.2, 0.2, 0.35, 1})
+                        if not col[4] then col[4] = 1 end
                         return {
                             message = {"^1.5 Chips and Mult!"},
                             Echip_mod = lenient_bignum(card.ability.Echips),
                             Emult_mod = lenient_bignum(card.ability.Emult),
-				            colour = G.C.DARK_EDITION,
+				            colour = col,
                         }
                     end
                 end
@@ -344,6 +350,9 @@ SMODS.Joker{
         end
     end
 }
+
+
+-- NOT PART OF PROGRAMING PROJECT
 
 -- Pity System
 -- Idea Ryder

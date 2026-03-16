@@ -3,6 +3,15 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
+# Guard engine draw_self so nil or missing colour[4] never crashes (e.g. mod UI or scoring)
+[[patches]]
+[patches.pattern]
+target = "engine/ui.lua"
+pattern = "if self.config.colour[4] > 0.01 then"
+position = "at"
+payload = "if self.config.colour and (self.config.colour[4] or 0) > 0.01 then"
+match_indent = true
+
 # Add G.GAME.invis_card_area to SMODS.get_card_areas('jokers') so OBJ_L amalgam jokers are evaluated
 [[patches]]
 [patches.pattern]
