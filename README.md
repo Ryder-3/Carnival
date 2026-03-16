@@ -13,7 +13,7 @@ Check this repo's [Wiki](https://github.com/Ryder-3/Carnival/wiki) page!
 
 # Credits
 Thank you very much to OBJ_Lily for the artwork!
-> *Twitter: (im never calling it X) [@OBJ_Lily](https://x.com/obj_lily)
+>* Twitter: (im never calling it X) [@OBJ_Lily](https://x.com/obj_lily)
 
 I guess I did some stuff too
 >* GitHub: ...you're already here
