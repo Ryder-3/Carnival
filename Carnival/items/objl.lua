@@ -91,7 +91,6 @@ SMODS.Joker {
     end,
 }
 
-local stored_amalgam_quads = {}
 --Amalgam joker
 SMODS.Joker {
     key = "objl_amalgam",
@@ -152,7 +151,10 @@ SMODS.Joker {
             local found = G.FUNCS.carnival_search_invis_area(card.ability.extra.stored_joker_keys[i])
             local joker = found and found[1]
             if joker then
-                info_queue[#info_queue+1] = joker
+                local center = (joker.config and joker.config.center) or (joker.config and joker.config.center_key and G.P_CENTERS[joker.config.center_key])
+                if center then
+                    info_queue[#info_queue+1] = center
+                end
             end
         end
 
@@ -167,11 +169,11 @@ SMODS.Joker {
             }
         }
     end,
-    draw = function(self, card, layer)
+    --[[draw = function(self, card, layer)
         --Updates the art in the amalgam to show all the jokers inside of it
         --TODO: Start work from here!
         --    loop through each stored joker, find their position in the amalgam, then cut their atlases and store the cut up parts as stored_amalgam_quads[key]
-    end
+    end]]
 }
 
 --#region seal of creation
